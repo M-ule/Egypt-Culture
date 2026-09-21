@@ -440,11 +440,12 @@ function renderBonus(){
     if(target!=='—'&&num(b.bonus,0))bonus.push(target+' +'+fmtPct(num(b.bonus,0)));
   }
   const horusPapyrusNote=app.settings.wonder==='호루스의 신전'
-    ?'<span class="bonus-note">※ <b>이벤트 전용 파피루스 생산 기준값이 적용됩니다.</b></span>'
+    ?'<span class="bonus-note">※ 이벤트 전용 파피루스 생산 기준값 적용</span>'
     :'';
   document.getElementById('bonusBox').innerHTML=
     '<div class="bonus-item"><span>생산 보너스</span><b>'+(bonus.length?bonus.join(' · '):'없음')+'</b></div>'+
-    '<div class="bonus-item"><span>추가 일꾼 수</span><b>'+fmtQty(num(w.workers,0))+'명</b>'+horusPapyrusNote+'</div>'+
+    horusPapyrusNote+
+    '<div class="bonus-item"><span>추가 일꾼 수</span><b>'+fmtQty(num(w.workers,0))+'명</b></div>'+
     '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b></div>';
 }
 function resourceRow(name){
