@@ -46,7 +46,7 @@ th,td{border-right:1px solid var(--border);border-bottom:1px solid var(--border)
 th:first-child,td:first-child{border-left:1px solid var(--border)} thead tr:first-child th{border-top:1px solid var(--border)}
 th{background:var(--primary);font-weight:800;font-size:11px;color:white;position:sticky;top:0;z-index:3}
 th:first-child{left:0;z-index:5}td:first-child{position:sticky;left:0;z-index:2}
-td.name{background:var(--soft);color:var(--primary-dark);font-weight:800}
+td.name{background:var(--soft);color:var(--primary-dark);font-weight:800;white-space:nowrap}
 td.calc{background:var(--soft-2);color:#515a3e}
 td.input-cell,td.fixed-input{background:var(--input);padding:2px 4px;position:relative}
 td.input-cell::before,td.fixed-input::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--input-border)}
@@ -170,7 +170,7 @@ body.detail-modal-open{overflow:hidden}
     </section>
   </div>
 
-  <div class="section-title-row"><h2>상품 (파피루스 두루마리 · 앙크 · 예복 · 황금 가면)</h2><div class="detail-actions"><button id="productDetailOpen" class="detail-open-btn" type="button">상품 상세 설정</button><span id="productDetailSummary" class="detail-summary">상세 설정 미사용</span></div></div>
+  <div class="section-title-row"><h2>상품 (파피루스두루마리 · 앙크 · 예복 · 황금 가면)</h2><div class="detail-actions"><button id="productDetailOpen" class="detail-open-btn" type="button">상품 상세 설정</button><span id="productDetailSummary" class="detail-summary">상세 설정 미사용</span></div></div>
   <div class="table-wrap"><table id="tProduct"><thead><tr>
     <th>상품</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>평균 행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>예상 생산량</th><th>화폐 사용량</th><th>파피루스 사용량</th><th>금 사용량</th>
   </tr></thead><tbody></tbody></table></div>
@@ -289,6 +289,7 @@ function fmtHours(v){if(v===null||v===undefined||!Number.isFinite(v))return '—
 function fmtBldg(v){if(v===null||v===undefined||!Number.isFinite(v))return '—';const r=tidyZero(Math.round(v*100)/100);return r.toLocaleString('ko-KR',{maximumFractionDigits:2})}
 function fmtPower(v){if(v===null||v===undefined||!Number.isFinite(v))return '—';const r=tidyZero(Math.round(v*10)/10);return r.toLocaleString('ko-KR',{maximumFractionDigits:1})}
 function fmtPct(v){return Number((v*100).toFixed(1)).toLocaleString('ko-KR',{maximumFractionDigits:1})+'%'}
+function displayName(name){return name==='파피루스 두루마리'?'파피루스두루마리':name}
 function fmtSignedPower(v){if(v===null||v===undefined||!Number.isFinite(v))return '—';const r=tidyZero(Math.round(v*10)/10);return r>0?'+'+fmtPower(r):fmtPower(r)}
 
 function rowsFor(building,lv,output=null){return RAW.filter(r=>r.building===building&&r.lv===Number(lv)&&(output===null||r.output===output))}
@@ -409,7 +410,7 @@ function resourceRow(name){
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(resourceActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
   const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'일괄')+'</td>';
-  return '<tr data-group="resources" data-name="'+name+'"><td class="name">'+name+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+
+  return '<tr data-group="resources" data-name="'+name+'"><td class="name">'+displayName(name)+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+
     '<td class="fixed-input">연속</td>'+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td>'+
     '<td class="num calc '+remainClass(remain)+'">'+fmtQty(remain)+'</td><td class="num calc">'+fmtQty(prod)+'</td><td class="num calc">'+fmtQty(cons)+'</td><td class="num calc">'+fmtHours(time)+'</td></tr>'
@@ -448,7 +449,7 @@ function commitRow(el,group,name){
 
 function wonderRow(product){
   const need=wonderNeed(product),prod=productOutput(product),stock=num(app.products[product].stock,0),expected=stock+prod,remain=expected-need;
-  return '<tr><td class="name">'+product+'</td><td class="num calc '+remainClass(remain)+'">'+fmtQty(remain)+'</td><td class="num calc">'+fmtQty(need)+'</td><td class="num calc">'+fmtQty(stock)+'</td><td class="num calc">'+fmtQty(prod)+'</td><td class="num calc">'+fmtQty(expected)+'</td><td class="num calc">'+fmtHours(wonderTime(product))+'</td></tr>'
+  return '<tr><td class="name">'+displayName(product)+'</td><td class="num calc '+remainClass(remain)+'">'+fmtQty(remain)+'</td><td class="num calc">'+fmtQty(need)+'</td><td class="num calc">'+fmtQty(stock)+'</td><td class="num calc">'+fmtQty(prod)+'</td><td class="num calc">'+fmtQty(expected)+'</td><td class="num calc">'+fmtHours(wonderTime(product))+'</td></tr>'
 }
 function renderWonder(){document.querySelector('#tGoal tbody').innerHTML=productOrder.map(wonderRow).join('');document.getElementById('wonderBaseHDisplay').textContent=fmtHours(app.settings.baseH)+' h'}
 
@@ -563,7 +564,7 @@ function requiredPowerIndex(a){return Number.isFinite(a.needed)?Math.max(0,a.nee
 function powerDifferenceIndex(a){return Number.isFinite(a.diff)?a.diff:null}
 function adjustmentRow(a){
   const c=currentPowerIndex(a),r=requiredPowerIndex(a),d=powerDifferenceIndex(a),shown=d===null?null:Math.round(d*10)/10,cls=shown===null?'':(shown<0?'remain-bad':'remain-ok'),rowCls=a.kind==='상품'&&a.name===productOrder[0]?' class="divider-top"':'';
-  return '<tr'+rowCls+'><td class="name">'+a.name+'</td><td class="num calc '+cls+'">'+(d===null?'—':fmtSignedPower(d))+'</td><td class="num calc">'+(c===null?'—':fmtPower(c))+'</td><td class="num calc">'+(r===null?'—':fmtPower(r))+'</td><td class="num calc">'+(a.basisNeed===null?'—':fmtQty(a.basisNeed))+'</td></tr>'
+  return '<tr'+rowCls+'><td class="name">'+displayName(a.name)+'</td><td class="num calc '+cls+'">'+(d===null?'—':fmtSignedPower(d))+'</td><td class="num calc">'+(c===null?'—':fmtPower(c))+'</td><td class="num calc">'+(r===null?'—':fmtPower(r))+'</td><td class="num calc">'+(a.basisNeed===null?'—':fmtQty(a.basisNeed))+'</td></tr>'
 }
 function renderAdjustment(){
   const rows=[...resourceOrder.map(resourceAdjustment),...productOrder.map(productAdjustment)];
@@ -581,7 +582,7 @@ function resourceConversionRatio(name,lv){
 }
 function conversionRow(kind,name){
   const isProduct=kind==='상품',mode=isProduct?app.products[name].mode:'연속',ratios=[3,4,5,6].map(lv=>isProduct?productConversionRatio(name,lv):resourceConversionRatio(name,lv)),rowCls=isProduct&&name===productOrder[0]?' class="divider-top"':'';
-  return '<tr'+rowCls+'><td class="name">'+name+'</td><td class="calc">'+mode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
+  return '<tr'+rowCls+'><td class="name">'+displayName(name)+'</td><td class="calc">'+mode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
 }
 function renderConversion(){document.querySelector('#tConvert tbody').innerHTML=[...resourceOrder.map(n=>conversionRow('자원',n)),...productOrder.map(n=>conversionRow('상품',n))].join('')}
 
@@ -595,13 +596,13 @@ function renderResourceDetailModal(){
 function openResourceDetailModal(name){if(name&&resourceOrder.includes(name))detailResource=name;const modal=document.getElementById('resourceDetailModal');modal.removeAttribute('hidden');modal.setAttribute('aria-hidden','false');document.body.classList.add('detail-modal-open');renderResourceDetailModal()}
 function closeResourceDetailModal(){const modal=document.getElementById('resourceDetailModal');modal.setAttribute('hidden','');modal.setAttribute('aria-hidden','true');document.body.classList.remove('detail-modal-open');document.getElementById('resourceDetailOpen')?.focus();postSize()}
 
-function renderDetailLauncher(){const active=productOrder.filter(detailEnabled);document.getElementById('productDetailSummary').textContent=active.length?'상세 설정 적용: '+active.join(' · '):'상세 설정 미사용'}
+function renderDetailLauncher(){const active=productOrder.filter(detailEnabled);document.getElementById('productDetailSummary').textContent=active.length?'상세 설정 적용: '+active.map(displayName).join(' · '):'상세 설정 미사용'}
 function detailModeOptions(name){return allProductModes(name).map(m=>'<option value="'+m+'"'+(m===app.products[name].mode?' selected':'')+'>'+m+'</option>').join('')}
 function detailLevelStepper(name,value){const levels=compatibleLevels(name,app.products[name].mode),minLv=levels.length?levels[0]:1,maxLv=levels.length?levels[levels.length-1]:6,safe=closestCompatibleLevel(name,app.products[name].mode,value);return '<div class="step-wrap"><input type="number" class="step-one" data-detail-k="lv" value="'+safe+'" min="'+minLv+'" max="'+maxLv+'" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 function detailRowHtml(name,row,index){return '<div class="detail-row" data-detail-index="'+index+'"><div class="detail-field"><label>레벨</label>'+detailLevelStepper(name,row.lv)+'</div><div class="detail-field"><label>건물 수</label>'+detailCountStepper('data-detail-k',row.count)+'</div><div class="detail-field"><label>행복도(%)</label>'+happinessInput('irrigation',row.irrigation,'data-detail-k')+'</div><div class="detail-field"><label>운영 시간(h)</label>'+detailHoursStepper('data-detail-k',row.hours)+'</div><button type="button" class="detail-remove" data-detail-remove="'+index+'" aria-label="구성 삭제">−</button><div class="detail-row-note">화폐·원재료 사용량은 행복도의 영향을 받지 않습니다.</div></div>'}
 function renderDetailResult(name){const el=document.getElementById('productDetailResult');if(!detailEnabled(name)){el.innerHTML='<b>기본 설정으로 계산 중</b> · 상세 설정을 사용하면 아래 건물 구성이 생산량과 소비량에 적용됩니다.';return}el.innerHTML='<b>현재 계산:</b> 건물 '+fmtBldg(productActualBuildings(name))+'개 · 예상 생산량 '+fmtQty(productOutput(name))+' · 화폐 '+fmtQty(productUse(name,'currency'))+' · '+rawForProduct[name]+' '+fmtQty(productUse(name,rawForProduct[name]))}
 function renderDetailModal(){
-  const d=app.details[detailProduct];document.getElementById('productDetailTabs').innerHTML=productOrder.map(name=>'<button type="button" class="detail-tab'+(name===detailProduct?' active':'')+'" data-detail-product="'+name+'">'+name+(detailEnabled(name)?'<span class="dot"></span>':'')+'</button>').join('');
+  const d=app.details[detailProduct];document.getElementById('productDetailTabs').innerHTML=productOrder.map(name=>'<button type="button" class="detail-tab'+(name===detailProduct?' active':'')+'" data-detail-product="'+name+'">'+displayName(name)+(detailEnabled(name)?'<span class="dot"></span>':'')+'</button>').join('');
   document.getElementById('productDetailEnabled').checked=!!d.enabled;document.getElementById('productDetailMode').innerHTML=detailModeOptions(detailProduct);const rows=document.getElementById('productDetailRows');rows.classList.toggle('detail-disabled',!d.enabled);rows.innerHTML=d.rows.length?d.rows.map((r,i)=>detailRowHtml(detailProduct,r,i)).join(''):'<div class="detail-help">등록된 건물 구성이 없습니다. 상세 설정을 켜거나 “건물 구성 추가”를 눌러 입력하세요.</div>';document.getElementById('productDetailAdd').disabled=!d.enabled;renderDetailResult(detailProduct);postSize()
 }
 function openDetailModal(name){if(name&&productOrder.includes(name))detailProduct=name;const modal=document.getElementById('productDetailModal');modal.removeAttribute('hidden');modal.setAttribute('aria-hidden','false');document.body.classList.add('detail-modal-open');renderDetailModal()}
