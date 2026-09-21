@@ -37,7 +37,6 @@ h2{font-size:15px;margin:16px 0 8px;padding-left:8px;border-left:4px solid var(-
 .wonder-settings{margin:0 0 8px;flex-wrap:nowrap}
 .sleep-settings{margin:0 0 8px;width:700px;max-width:100%;min-height:48px}
 .sleep-settings .sleep-time-wrap{width:92px}.sleep-settings .sleep-time-wrap input{width:72px;min-width:0}
-.sleep-cycle-actual{width:700px;max-width:100%;margin:-2px 0 8px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:#fff8d9;color:#6f624c;font-size:11px;font-weight:700;line-height:1.5}
 .bonus-box{display:flex;flex-wrap:wrap;gap:8px 18px;padding:9px 12px;background:var(--soft-2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:12px;max-width:100%;width:var(--main-width)}
 .bonus-item{display:flex;gap:6px;align-items:baseline}.bonus-item b{color:#4a3f2c}
 .bonus-note{color:#7a5a20;font-weight:700}
@@ -104,7 +103,7 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 .detail-field{display:flex;flex-direction:column;gap:4px;min-width:0}.detail-field label{font-size:11px;font-weight:800;color:#5a4d38}.detail-field input,.detail-field select{min-height:40px;font-size:14px}
 .detail-toggle-wrap{display:flex;align-items:center;gap:8px;min-height:40px}.detail-toggle-wrap input{width:18px;height:18px;min-width:18px}.detail-toggle-wrap label{font-size:12px;font-weight:800}
 .detail-help,.detail-result{font-size:11px;line-height:1.6;border-radius:7px;padding:8px 10px;margin-bottom:8px}.detail-help{color:#6f624c;background:#fff8d9;border:1px solid var(--input-border)}.detail-result{color:#5a4d38;background:var(--soft-2);border:1px solid var(--border)}
-.detail-rows{display:flex;flex-direction:column;gap:7px}.detail-row{display:grid;grid-template-columns:.8fr 1.5fr 1fr 1fr auto;gap:7px;align-items:end;padding:9px;background:var(--soft-2);border:1px solid var(--border);border-radius:8px}
+.detail-rows{display:flex;flex-direction:column;gap:7px}.detail-row{display:grid;grid-template-columns:.75fr 1fr 1.35fr 1fr 1fr auto;gap:7px;align-items:end;padding:9px;background:var(--soft-2);border:1px solid var(--border);border-radius:8px}
 .detail-row .detail-field input,.detail-row .detail-field select{background:#fff8d9}.detail-row-note{grid-column:1/-1;font-size:10px;color:var(--muted);line-height:1.45}
 .detail-remove{width:40px;height:40px;border:1px solid #e8b8b6;border-radius:7px;background:#f7e0df;color:#8e2d2d;cursor:pointer;font:900 16px var(--font)}
 .detail-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}.detail-add{min-height:40px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;background:var(--soft-2);color:#4a3f2c;cursor:pointer;font:800 12px var(--font)}.detail-add:disabled{opacity:.45;cursor:not-allowed}.detail-disabled{opacity:.62}
@@ -203,11 +202,10 @@ body.detail-modal-open{overflow:hidden}
   <div id="productDetailModal" class="detail-modal" hidden aria-hidden="true">
     <div class="detail-backdrop" data-detail-close></div>
     <section class="detail-sheet" role="dialog" aria-modal="true" aria-labelledby="productDetailTitle">
-      <div class="detail-head"><div><h3 id="productDetailTitle">상품 상세 설정</h3><p>선택한 생산 방식에서 가능한 레벨의 건물을 혼합해 계산합니다.</p></div><button type="button" class="detail-close" data-detail-close aria-label="닫기">×</button></div>
+      <div class="detail-head"><div><h3 id="productDetailTitle">상품 상세 설정</h3><p>각 건물 구성의 레벨에 맞는 생산 방식으로 계산합니다.</p></div><button type="button" class="detail-close" data-detail-close aria-label="닫기">×</button></div>
       <div id="productDetailTabs" class="detail-tabs"></div>
       <div class="detail-toolbar">
         <div class="detail-field"><label>상세 설정</label><div class="detail-toggle-wrap"><input type="checkbox" id="productDetailEnabled"><label for="productDetailEnabled">이 상품에 상세 설정 적용</label></div></div>
-        <div class="detail-field"><label for="productDetailMode">생산 방식</label><select id="productDetailMode"></select></div>
       </div>
       <div class="detail-help">행복도는 <b>상품 생산량에만 반영</b>되며 화폐·원재료 사용량에는 영향을 주지 않습니다. 상품은 생산 주기가 완전히 끝난 횟수만 생산량과 소비량에 반영됩니다.</div>
       <div id="productDetailResult" class="detail-result"></div>
@@ -247,7 +245,6 @@ body.detail-modal-open{overflow:hidden}
     <label for="sleepCount">생산 횟수</label>
     <div class="step-wrap"><input id="sleepCount" class="step-one" type="number" min="0" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
   </div>
-  <div id="sleepCycleActual" class="sleep-cycle-actual" aria-live="polite"></div>
   <div class="table-wrap"><table id="tSleep"><thead><tr>
     <th>자원</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>필요량</th><th>예상 확보량</th><th>잔여/부족</th>
   </tr></thead><tbody></tbody></table></div>
@@ -323,7 +320,17 @@ function infoProduct(name,lv,mode){return RAW.find(r=>r.type==='상품'&&r.outpu
 function infoResource(name,lv){const p=RAW.find(r=>r.type==='자원'&&r.output===name&&r.lv===Number(lv))||null;if(!p)return null;if(app.settings.wonder==='호루스의 신전'&&name==='파피루스'){const base=HORUS_PAPYRUS_BASE[Number(lv)];return base===undefined?p:{...p,out0:base};}return p}
 function allProductModes(name){const order=['1분','5분','30분','1시간','2시간'],found=new Set();for(let lv=1;lv<=6;lv++)modesForProduct(name,lv).forEach(m=>found.add(m));return order.filter(m=>found.has(m))}
 function compatibleLevels(name,mode){const a=[];for(let lv=1;lv<=6;lv++)if(modesForProduct(name,lv).includes(mode))a.push(lv);return a}
-function closestCompatibleLevel(name,mode,lv){const levels=compatibleLevels(name,mode);if(!levels.length)return productOrder.includes(name)&&['예복','황금 가면'].includes(name)?4:1;const n=clamp(parseInt(lv)||levels[0],1,6);return levels.reduce((best,x)=>Math.abs(x-n)<Math.abs(best-n)?x:best,levels[0])}
+function productLevels(name){const a=[];for(let lv=1;lv<=6;lv++)if(modesForProduct(name,lv).length)a.push(lv);return a}
+function closestProductLevel(name,lv){const levels=productLevels(name);if(!levels.length)return 1;const n=clamp(parseInt(lv)||levels[0],1,6);return levels.reduce((best,x)=>Math.abs(x-n)<Math.abs(best-n)?x:best,levels[0])}
+function modeMinutesValue(mode){return {'1분':1,'5분':5,'30분':30,'1시간':60,'2시간':120}[mode]||null}
+function closestModeForLevel(name,lv,mode){
+  const modes=modesForProduct(name,lv);if(!modes.length)return null;
+  if(modes.includes(mode))return mode;
+  const wanted=modeMinutesValue(mode);if(!(wanted>0))return modes[0];
+  return modes.reduce((best,m)=>Math.abs(modeMinutesValue(m)-wanted)<Math.abs(modeMinutesValue(best)-wanted)?m:best,modes[0])
+}
+function modeOptionsForLevel(name,lv,selected){return modesForProduct(name,lv).map(m=>'<option value="'+m+'"'+(m===selected?' selected':'')+'>'+m+'</option>').join('')}
+function closestCompatibleLevel(name,mode,lv){const levels=compatibleLevels(name,mode);if(!levels.length)return closestProductLevel(name,lv);const n=clamp(parseInt(lv)||levels[0],1,6);return levels.reduce((best,x)=>Math.abs(x-n)<Math.abs(best-n)?x:best,levels[0])}
 function cyclesFor(hours,min){return Math.max(0,Math.floor((hours*60)/min+1e-10))}
 function happinessRatio(v){return clamp(num(v,100),0,100)/100}
 function normalizedHappiness(v,fallback=100){const n=Number(v);return Number.isFinite(n)?clamp(n,0,100):fallback}
@@ -354,11 +361,11 @@ function resourceDetailLevelText(name){if(!resourceDetailEnabled(name))return St
 
 function normalizeDetailProduct(name){
   const d=app.details[name]||(app.details[name]={enabled:false,rows:[]});d.enabled=!!d.enabled;if(!Array.isArray(d.rows))d.rows=[];
-  const mode=app.products[name].mode;d.rows=d.rows.slice(0,20).map(row=>({lv:closestCompatibleLevel(name,mode,row?.lv),count:Math.max(0,num(row?.count,0)),irrigation:normalizedHappiness(row?.irrigation??row?.happiness,100),hours:normalizedDetailHours(row?.hours)}))
+  d.rows=d.rows.slice(0,20).map(row=>{const lv=closestProductLevel(name,row?.lv);return {lv,mode:closestModeForLevel(name,lv,row?.mode||app.products[name].mode),count:Math.max(0,num(row?.count,0)),irrigation:normalizedHappiness(row?.irrigation??row?.happiness,100),hours:normalizedDetailHours(row?.hours)}})
 }
 function normalizeDetails(){productOrder.forEach(normalizeDetailProduct)}
 function detailEnabled(name){return !!(app.details[name]?.enabled&&app.details[name]?.rows?.length)}
-function seedDetailFromLegacy(name){const d=app.details[name];if(d.rows.length)return;const s=app.products[name];d.rows=[{lv:closestCompatibleLevel(name,s.mode,s.lv),count:Math.max(0,num(s.bldgs,0)),irrigation:normalizedHappiness(s.irrigation,100),hours:normalizedDetailHours(s.hours)}]}
+function seedDetailFromLegacy(name){const d=app.details[name];if(d.rows.length)return;const s=app.products[name],lv=closestProductLevel(name,s.lv);d.rows=[{lv,mode:closestModeForLevel(name,lv,s.mode),count:Math.max(0,num(s.bldgs,0)),irrigation:normalizedHappiness(s.irrigation,100),hours:normalizedDetailHours(s.hours)}]}
 function productActualBuildings(name){return detailEnabled(name)?app.details[name].rows.reduce((s,r)=>s+Math.max(0,num(r.count,0)),0):app.products[name].bldgs}
 function productDetailLevelText(name){if(!detailEnabled(name))return String(app.products[name].lv);const levels=[...new Set(app.details[name].rows.filter(r=>num(r.count,0)>0).map(r=>r.lv))].sort((a,b)=>b-a);return !levels.length?'—':levels.length===1?String(levels[0]):levels.join('·')}
 
@@ -374,20 +381,20 @@ function resourceOutput(name){
 }
 function productOutputForHours(name,h){
   h=Math.max(0,num(h,0));
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicOutput(infoProduct(name,row.lv,app.products[name].mode),h,Math.max(0,num(row.count,0)),row.irrigation),0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicOutput(infoProduct(name,row.lv,row.mode),h,Math.max(0,num(row.count,0)),row.irrigation),0);
   const s=app.products[name];return cyclicOutput(infoProduct(name,s.lv,s.mode),h,s.bldgs,s.irrigation)
 }
 function productOutput(name){
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicOutput(infoProduct(name,row.lv,app.products[name].mode),detailHours(row),Math.max(0,num(row.count,0)),row.irrigation),0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicOutput(infoProduct(name,row.lv,row.mode),detailHours(row),Math.max(0,num(row.count,0)),row.irrigation),0);
   return productOutputForHours(name,effectiveHours('products',name))
 }
 function productUseForHours(name,kind,h){
   h=Math.max(0,num(h,0));
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,app.products[name].mode),h,Math.max(0,num(row.count,0)),kind),0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),h,Math.max(0,num(row.count,0)),kind),0);
   const s=app.products[name];return cyclicUse(infoProduct(name,s.lv,s.mode),h,s.bldgs,kind)
 }
 function productUse(name,kind){
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,app.products[name].mode),detailHours(row),Math.max(0,num(row.count,0)),kind),0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),detailHours(row),Math.max(0,num(row.count,0)),kind),0);
   return productUseForHours(name,kind,effectiveHours('products',name))
 }
 function rawConsumption(raw){return productOrder.reduce((sum,n)=>sum+productUse(n,raw),0)}
@@ -397,16 +404,24 @@ function resourceRequiredHours(name,consumption){
 }
 
 function productPerCycleOutput(name){
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>{const p=infoProduct(name,row.lv,app.products[name].mode);return sum+(p?happyCycleOutput(p,row.irrigation)*Math.max(0,num(row.count,0)):0)},0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>{const p=infoProduct(name,row.lv,row.mode);return sum+(p?happyCycleOutput(p,row.irrigation)*Math.max(0,num(row.count,0)):0)},0);
   const s=app.products[name],p=infoProduct(name,s.lv,s.mode);return p?happyCycleOutput(p,s.irrigation)*s.bldgs:0
 }
 function productCycleMinutes(name){
-  if(detailEnabled(name)){for(const row of app.details[name].rows){const p=infoProduct(name,row.lv,app.products[name].mode);if(p)return p.min}}
+  if(detailEnabled(name)){for(const row of app.details[name].rows){const p=infoProduct(name,row.lv,row.mode);if(p)return p.min}}
   return infoProduct(name,app.products[name].lv,app.products[name].mode)?.min||null
 }
 
 function wonderNeed(product){if(app.wonder.tgt<=app.wonder.cur)return 0;let sum=0;for(let lv=app.wonder.cur+1;lv<=app.wonder.tgt;lv++)sum+=num(WONDER[String(lv)]?.[product],0);return sum}
-function wonderTime(product){const shortfall=Math.max(0,wonderNeed(product)-num(app.products[product].stock,0));if(shortfall===0)return 0;const perCycle=productPerCycleOutput(product),cycleMin=productCycleMinutes(product);if(perCycle<=0||!cycleMin)return null;return Math.ceil(shortfall/perCycle-1e-12)*(cycleMin/60)}
+function wonderTime(product){
+  const shortfall=Math.max(0,wonderNeed(product)-num(app.products[product].stock,0));if(shortfall===0)return 0;
+  if(!detailEnabled(product)){const perCycle=productPerCycleOutput(product),cycleMin=productCycleMinutes(product);if(perCycle<=0||!cycleMin)return null;return Math.ceil(shortfall/perCycle-1e-12)*(cycleMin/60)}
+  if(productOutputForHours(product,1000000)<shortfall)return null;
+  let lo=0,hi=1/60;while(productOutputForHours(product,hi)<shortfall&&hi<1000000)hi*=2;
+  if(hi>=1000000&&productOutputForHours(product,hi)<shortfall)return null;
+  for(let i=0;i<60;i++){const mid=(lo+hi)/2;if(productOutputForHours(product,mid)>=shortfall)hi=mid;else lo=mid}
+  return hi
+}
 
 function remainClass(v){const shown=Math.round(tidyZero(num(v,0)));return shown>=0?'remain-ok':'remain-bad'}
 function stepper(k,value,placeholder=''){const val=value===''?'':value;return '<div class="step-wrap"><input type="number" class="step-one" data-k="'+k+'" value="'+val+'" step="any" min="0"'+(placeholder?' placeholder="'+placeholder+'"':'')+'><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
@@ -442,14 +457,15 @@ function resourceRow(name){
 }
 function productRow(name){
   const s=app.products[name],out=productOutput(name),detail=detailEnabled(name);
-  const levels=compatibleLevels(name,s.mode),minLv=levels.length?levels[0]:1,maxLv=levels.length?levels[levels.length-1]:6;
-  const modeHtml=allProductModes(name).map(m=>'<option value="'+m+'"'+(m===s.mode?' selected':'')+'>'+m+'</option>').join('');
+  const levels=productLevels(name),minLv=levels.length?levels[0]:1,maxLv=levels.length?levels[levels.length-1]:6;
+  s.lv=closestProductLevel(name,s.lv);s.mode=closestModeForLevel(name,s.lv,s.mode);
+  const modeHtml=modeOptionsForLevel(name,s.lv,s.mode);
   const levelCell=detail?'<td class="calc detail-active-cell">'+productDetailLevelText(name)+'</td>':'<td class="input-cell">'+levelStepper(s.lv,minLv,maxLv)+'</td>';
+  const modeCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell"><select data-k="mode">'+modeHtml+'</select></td>';
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(productActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
   const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'일괄')+'</td>';
-  return '<tr data-group="products" data-name="'+name+'"><td class="name">'+name+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+
-    '<td class="input-cell"><select data-k="mode">'+modeHtml+'</select></td>'+bldgCell+happyCell+hoursCell+
+  return '<tr data-group="products" data-name="'+name+'"><td class="name">'+name+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+modeCell+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td><td class="num calc">'+fmtQty(out)+'</td>'+
     '<td class="num calc">'+fmtQty(productUse(name,'currency'))+'</td><td class="num calc">'+fmtQty(productUse(name,'파피루스'))+'</td><td class="num calc">'+fmtQty(productUse(name,'금'))+'</td></tr>'
 }
@@ -463,8 +479,8 @@ function commitRow(el,group,name){
   const k=el.dataset.k,v=el.value,s=app[group][name];
   if(k==='lv'){
     if(group==='resources')s.lv=clamp(parseInt(v)||1,1,6);
-    else{s.lv=closestCompatibleLevel(name,s.mode,parseInt(v)||s.lv)}
-  }else if(k==='mode'){s.mode=v;s.lv=closestCompatibleLevel(name,s.mode,s.lv);normalizeDetailProduct(name)}
+    else{s.lv=closestProductLevel(name,parseInt(v)||s.lv);s.mode=closestModeForLevel(name,s.lv,s.mode)}
+  }else if(k==='mode'){const modes=modesForProduct(name,s.lv);if(modes.includes(v))s.mode=v}
   else if(k==='bldgs')s.bldgs=Math.max(0,num(v,0));
   else if(k==='irrigation')s.irrigation=normalizedHappiness(v,100);
   else if(k==='stock')s.stock=Math.round(num(v,0));
@@ -479,31 +495,14 @@ function wonderRow(product){
 function renderWonder(){document.querySelector('#tGoal tbody').innerHTML=productOrder.map(wonderRow).join('');document.getElementById('wonderBaseHDisplay').textContent=fmtHours(app.settings.baseH)+' h'}
 
 function sleepRecipe(name,lv){
-  const modes=modesForProduct(name,lv),desired=app.settings.sleepCycle;let chosen=modes.includes(desired)?desired:null;
-  if(!chosen){let best=null;for(const mode of modes){const p=infoProduct(name,lv,mode);if(p&&(!best||p.min>best.p.min))best={p,mode}}chosen=best?.mode||null}
-  const p=chosen?infoProduct(name,lv,chosen):null;return p?{p,cycles:Math.max(0,Math.floor(num(app.settings.sleepCount,3))),mode:chosen}:null
+  const chosen=closestModeForLevel(name,lv,app.settings.sleepCycle),p=chosen?infoProduct(name,lv,chosen):null;
+  return p?{p,cycles:Math.max(0,Math.floor(num(app.settings.sleepCount,3))),mode:chosen}:null
 }
 function sleepRequirementForProduct(name,raw){
   if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>{const r=sleepRecipe(name,row.lv);if(!r||r.p.raw!==raw)return sum;return sum+r.cycles*r.p.rawUse*Math.max(0,num(row.count,0))},0);
   const s=app.products[name],r=sleepRecipe(name,s.lv);if(!r||r.p.raw!==raw)return 0;return r.cycles*r.p.rawUse*s.bldgs
 }
 function sleepRawRequirement(raw){return productOrder.reduce((sum,n)=>sum+sleepRequirementForProduct(n,raw),0)}
-function sleepAppliedCycleSummary(){
-  const parts=[];
-  for(const name of productOrder){
-    const modes=new Set();
-    if(detailEnabled(name)){
-      for(const row of app.details[name].rows){
-        if(Math.max(0,num(row.count,0))<=0)continue;
-        const r=sleepRecipe(name,row.lv);if(r)modes.add(r.mode)
-      }
-    }else if(Math.max(0,num(app.products[name].bldgs,0))>0){
-      const r=sleepRecipe(name,app.products[name].lv);if(r)modes.add(r.mode)
-    }
-    if(modes.size)parts.push(displayName(name)+' '+[...modes].join('·'))
-  }
-  return parts.length?'실제 적용 생산 주기 · '+parts.join(' · '):'실제 적용 생산 주기 · 생산 건물 없음'
-}
 function sleepPrepHours(){return app.settings.sleepPrepH===''?Math.max(0,num(app.settings.baseH,0)):Math.max(0,num(app.settings.sleepPrepH,0))}
 function resourceBenchmarkRate(name){
   const p=infoResource(name,6);if(!p)return 0;
@@ -537,7 +536,7 @@ function sleepRow(name){
   const a=sleepResourcePower(name),shownDiff=a.diff===null?null:Math.round(a.diff*10)/10,cls=shownDiff===null?'':(shownDiff<0?'remain-bad':'remain-ok');
   return '<tr><td class="name">'+name+'</td><td class="num calc '+cls+'">'+(a.diff===null?'준비 시간 확인':fmtSignedPower(a.diff))+'</td><td class="num calc">'+fmtPower(a.current)+'</td><td class="num calc">'+(a.needed===null?'—':fmtPower(a.needed))+'</td><td class="num calc">'+fmtQty(a.sleepNeed)+'</td><td class="num calc">'+fmtQty(a.projected)+'</td><td class="num calc">'+fmtQty(a.remain)+'</td></tr>'
 }
-function renderSleepReserve(){document.querySelector('#tSleep tbody').innerHTML=resourceOrder.map(sleepRow).join('');document.getElementById('sleepCycleActual').textContent=sleepAppliedCycleSummary()}
+function renderSleepReserve(){document.querySelector('#tSleep tbody').innerHTML=resourceOrder.map(sleepRow).join('')}
 
 function productBenchmarkRate(name){
   const p=infoProduct(name,6,'30분');if(!p)return 0;
@@ -551,7 +550,7 @@ function productCurrentPower(name){
   const ref=productBenchmarkRate(name);if(!(ref>0))return null;
   let rate=0;
   if(detailEnabled(name)){
-    rate=app.details[name].rows.reduce((sum,row)=>sum+productConfigRate(name,row.lv,app.products[name].mode,row.irrigation)*Math.max(0,num(row.count,0)),0)
+    rate=app.details[name].rows.reduce((sum,row)=>sum+productConfigRate(name,row.lv,row.mode,row.irrigation)*Math.max(0,num(row.count,0)),0)
   }else{
     const s=app.products[name];rate=productConfigRate(name,s.lv,s.mode,s.irrigation)*Math.max(0,num(s.bldgs,0))
   }
@@ -639,13 +638,13 @@ function openResourceDetailModal(name){if(name&&resourceOrder.includes(name))det
 function closeResourceDetailModal(){const modal=document.getElementById('resourceDetailModal');modal.setAttribute('hidden','');modal.setAttribute('aria-hidden','true');document.body.classList.remove('detail-modal-open');document.getElementById('resourceDetailOpen')?.focus();postSize()}
 
 function renderDetailLauncher(){const active=productOrder.filter(detailEnabled);document.getElementById('productDetailSummary').textContent=active.length?'상세 설정 적용: '+active.map(displayName).join(' · '):'상세 설정 미사용'}
-function detailModeOptions(name){return allProductModes(name).map(m=>'<option value="'+m+'"'+(m===app.products[name].mode?' selected':'')+'>'+m+'</option>').join('')}
-function detailLevelStepper(name,value){const levels=compatibleLevels(name,app.products[name].mode),minLv=levels.length?levels[0]:1,maxLv=levels.length?levels[levels.length-1]:6,safe=closestCompatibleLevel(name,app.products[name].mode,value);return '<div class="step-wrap"><input type="number" class="step-one" data-detail-k="lv" value="'+safe+'" min="'+minLv+'" max="'+maxLv+'" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
-function detailRowHtml(name,row,index){return '<div class="detail-row" data-detail-index="'+index+'"><div class="detail-field"><label>레벨</label>'+detailLevelStepper(name,row.lv)+'</div><div class="detail-field"><label>건물 수</label>'+detailCountStepper('data-detail-k',row.count)+'</div><div class="detail-field"><label>행복도(%)</label>'+happinessInput('irrigation',row.irrigation,'data-detail-k')+'</div><div class="detail-field"><label>운영 시간(h)</label>'+detailHoursStepper('data-detail-k',row.hours)+'</div><button type="button" class="detail-remove" data-detail-remove="'+index+'" aria-label="구성 삭제">−</button><div class="detail-row-note">화폐·원재료 사용량은 행복도의 영향을 받지 않습니다.</div></div>'}
+function detailLevelStepper(name,value){const levels=productLevels(name),minLv=levels.length?levels[0]:1,maxLv=levels.length?levels[levels.length-1]:6,safe=closestProductLevel(name,value);return '<div class="step-wrap"><input type="number" class="step-one" data-detail-k="lv" value="'+safe+'" min="'+minLv+'" max="'+maxLv+'" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
+function detailModeSelect(name,row){return '<select data-detail-k="mode">'+modeOptionsForLevel(name,row.lv,row.mode)+'</select>'}
+function detailRowHtml(name,row,index){return '<div class="detail-row" data-detail-index="'+index+'"><div class="detail-field"><label>레벨</label>'+detailLevelStepper(name,row.lv)+'</div><div class="detail-field"><label>생산 방식</label>'+detailModeSelect(name,row)+'</div><div class="detail-field"><label>건물 수</label>'+detailCountStepper('data-detail-k',row.count)+'</div><div class="detail-field"><label>행복도(%)</label>'+happinessInput('irrigation',row.irrigation,'data-detail-k')+'</div><div class="detail-field"><label>운영 시간(h)</label>'+detailHoursStepper('data-detail-k',row.hours)+'</div><button type="button" class="detail-remove" data-detail-remove="'+index+'" aria-label="구성 삭제">−</button><div class="detail-row-note">화폐·원재료 사용량은 행복도의 영향을 받지 않습니다.</div></div>'}
 function renderDetailResult(name){const el=document.getElementById('productDetailResult');if(!detailEnabled(name)){el.innerHTML='<b>기본 설정으로 계산 중</b> · 상세 설정을 사용하면 아래 건물 구성이 생산량과 소비량에 적용됩니다.';return}el.innerHTML='<b>현재 계산:</b> 건물 '+fmtBldg(productActualBuildings(name))+'개 · 예상 생산량 '+fmtQty(productOutput(name))+' · 화폐 '+fmtQty(productUse(name,'currency'))+' · '+rawForProduct[name]+' '+fmtQty(productUse(name,rawForProduct[name]))}
 function renderDetailModal(){
   const d=app.details[detailProduct];document.getElementById('productDetailTabs').innerHTML=productOrder.map(name=>'<button type="button" class="detail-tab'+(name===detailProduct?' active':'')+'" data-detail-product="'+name+'">'+displayName(name)+(detailEnabled(name)?'<span class="dot"></span>':'')+'</button>').join('');
-  document.getElementById('productDetailEnabled').checked=!!d.enabled;document.getElementById('productDetailMode').innerHTML=detailModeOptions(detailProduct);const rows=document.getElementById('productDetailRows');rows.classList.toggle('detail-disabled',!d.enabled);rows.innerHTML=d.rows.length?d.rows.map((r,i)=>detailRowHtml(detailProduct,r,i)).join(''):'<div class="detail-help">등록된 건물 구성이 없습니다. 상세 설정을 켜거나 “건물 구성 추가”를 눌러 입력하세요.</div>';document.getElementById('productDetailAdd').disabled=!d.enabled;renderDetailResult(detailProduct);postSize()
+  document.getElementById('productDetailEnabled').checked=!!d.enabled;const rows=document.getElementById('productDetailRows');rows.classList.toggle('detail-disabled',!d.enabled);rows.innerHTML=d.rows.length?d.rows.map((r,i)=>detailRowHtml(detailProduct,r,i)).join(''):'<div class="detail-help">등록된 건물 구성이 없습니다. 상세 설정을 켜거나 “건물 구성 추가”를 눌러 입력하세요.</div>';document.getElementById('productDetailAdd').disabled=!d.enabled;renderDetailResult(detailProduct);postSize()
 }
 function openDetailModal(name){if(name&&productOrder.includes(name))detailProduct=name;const modal=document.getElementById('productDetailModal');modal.removeAttribute('hidden');modal.setAttribute('aria-hidden','false');document.body.classList.add('detail-modal-open');renderDetailModal()}
 function closeDetailModal(){const modal=document.getElementById('productDetailModal');modal.setAttribute('hidden','');modal.setAttribute('aria-hidden','true');document.body.classList.remove('detail-modal-open');document.getElementById('productDetailOpen')?.focus();postSize()}
@@ -661,7 +660,7 @@ function normalizeLoaded(obj){
   if(!wonderNames.includes(d.settings.wonder))d.settings.wonder='아부심벨';d.settings.wLv=clamp(parseInt(d.settings.wLv)||0,0,50);d.settings.baseH=Math.max(0,num(d.settings.baseH,0));d.settings.sleepPrepH=d.settings.sleepPrepH===''||d.settings.sleepPrepH===null||d.settings.sleepPrepH===undefined?'':Math.max(0,num(d.settings.sleepPrepH,0));if(!['30분','1시간','2시간'].includes(d.settings.sleepCycle))d.settings.sleepCycle='2시간';d.settings.sleepCount=Math.max(0,Math.floor(num(d.settings.sleepCount,3)));
   d.wonder.cur=clamp(parseInt(d.wonder.cur)||0,0,50);d.wonder.tgt=Math.max(d.wonder.cur,clamp(parseInt(d.wonder.tgt)||0,0,50));
   for(const n of resourceOrder){const s=d.resources[n];s.lv=clamp(parseInt(s.lv)||1,1,6);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
-  for(const n of productOrder){const s=d.products[n];const modes=allProductModes(n);if(!modes.includes(s.mode))s.mode=modes[0];s.lv=closestCompatibleLevel(n,s.mode,s.lv);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
+  for(const n of productOrder){const s=d.products[n];s.lv=closestProductLevel(n,s.lv);s.mode=closestModeForLevel(n,s.lv,s.mode);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
   return d
 }
 function syncSettingsInputs(){document.getElementById('wonderName').value=app.settings.wonder;document.getElementById('bonusLv').value=app.settings.wLv;document.getElementById('baseH').value=app.settings.baseH;document.getElementById('sleepPrepH').value=app.settings.sleepPrepH;document.getElementById('sleepCycle').value=app.settings.sleepCycle;document.getElementById('sleepCount').value=app.settings.sleepCount;document.getElementById('curLv').value=app.wonder.cur;document.getElementById('tgtLv').value=app.wonder.tgt}
@@ -693,9 +692,8 @@ document.getElementById('resourceDetailRows').addEventListener('change',e=>{cons
 document.getElementById('productDetailOpen').addEventListener('click',()=>openDetailModal())
 document.getElementById('productDetailModal').addEventListener('click',e=>{if(e.target.closest('[data-detail-close]')){closeDetailModal();return}const tab=e.target.closest('[data-detail-product]');if(tab){detailProduct=tab.dataset.detailProduct;renderDetailModal();return}const remove=e.target.closest('[data-detail-remove]');if(remove){const idx=parseInt(remove.dataset.detailRemove);if(Number.isInteger(idx))app.details[detailProduct].rows.splice(idx,1);if(app.details[detailProduct].enabled&&!app.details[detailProduct].rows.length)app.details[detailProduct].enabled=false;normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()}})
 document.getElementById('productDetailEnabled').addEventListener('change',e=>{const d=app.details[detailProduct];d.enabled=!!e.target.checked;if(d.enabled)seedDetailFromLegacy(detailProduct);normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()})
-document.getElementById('productDetailMode').addEventListener('change',e=>{app.products[detailProduct].mode=e.target.value;app.products[detailProduct].lv=closestCompatibleLevel(detailProduct,app.products[detailProduct].mode,app.products[detailProduct].lv);normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()})
-document.getElementById('productDetailAdd').addEventListener('click',()=>{const d=app.details[detailProduct];if(!d.enabled)return;const levels=compatibleLevels(detailProduct,app.products[detailProduct].mode),lv=levels.includes(app.products[detailProduct].lv)?app.products[detailProduct].lv:(levels[levels.length-1]||1);d.rows.push({lv,count:1,irrigation:normalizedHappiness(app.products[detailProduct].irrigation,100),hours:''});normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()})
-document.getElementById('productDetailRows').addEventListener('change',e=>{const el=e.target.closest('[data-detail-k]');if(!el)return;const rowEl=el.closest('[data-detail-index]');if(!rowEl)return;const idx=parseInt(rowEl.dataset.detailIndex),row=app.details[detailProduct].rows[idx];if(!row)return;const k=el.dataset.detailK;if(k==='lv')row.lv=closestCompatibleLevel(detailProduct,app.products[detailProduct].mode,parseInt(el.value)||1);if(k==='count')row.count=Math.max(0,num(el.value,0));if(k==='irrigation')row.irrigation=normalizedHappiness(el.value,100);if(k==='hours')row.hours=normalizedDetailHours(el.value);normalizeDetailProduct(detailProduct);renderAll();renderDetailResult(detailProduct);saveState()})
+document.getElementById('productDetailAdd').addEventListener('click',()=>{const d=app.details[detailProduct];if(!d.enabled)return;const s=app.products[detailProduct],lv=closestProductLevel(detailProduct,s.lv),mode=closestModeForLevel(detailProduct,lv,s.mode);d.rows.push({lv,mode,count:1,irrigation:normalizedHappiness(s.irrigation,100),hours:''});normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()})
+document.getElementById('productDetailRows').addEventListener('change',e=>{const el=e.target.closest('[data-detail-k]');if(!el)return;const rowEl=el.closest('[data-detail-index]');if(!rowEl)return;const idx=parseInt(rowEl.dataset.detailIndex),row=app.details[detailProduct].rows[idx];if(!row)return;const k=el.dataset.detailK;if(k==='lv'){row.lv=closestProductLevel(detailProduct,parseInt(el.value)||row.lv);row.mode=closestModeForLevel(detailProduct,row.lv,row.mode)}if(k==='mode'){const modes=modesForProduct(detailProduct,row.lv);if(modes.includes(el.value))row.mode=el.value}if(k==='count')row.count=Math.max(0,num(el.value,0));if(k==='irrigation')row.irrigation=normalizedHappiness(el.value,100);if(k==='hours')row.hours=normalizedDetailHours(el.value);normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()})
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!document.getElementById('resourceDetailModal').hasAttribute('hidden')){closeResourceDetailModal();return}if(!document.getElementById('productDetailModal').hasAttribute('hidden'))closeDetailModal()})
 
 const convertToggle=document.getElementById('convertToggle'),convertPanel=document.getElementById('convertPanel');
