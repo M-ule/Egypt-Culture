@@ -37,6 +37,7 @@ h2{font-size:15px;margin:16px 0 8px;padding-left:8px;border-left:4px solid var(-
 .wonder-settings{margin:0 0 8px;flex-wrap:nowrap}
 .sleep-settings{margin:0 0 8px;width:700px;max-width:100%;min-height:48px}
 .sleep-settings .sleep-time-wrap{width:92px}.sleep-settings .sleep-time-wrap input{width:72px;min-width:0}
+.sleep-cycle-actual{width:700px;max-width:100%;margin:-2px 0 8px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:#fff8d9;color:#6f624c;font-size:11px;font-weight:700;line-height:1.5}
 .bonus-box{display:flex;flex-wrap:wrap;gap:8px 18px;padding:9px 12px;background:var(--soft-2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:12px;max-width:100%;width:var(--main-width)}
 .bonus-item{display:flex;gap:6px;align-items:baseline}.bonus-item b{color:#4a3f2c}
 .bonus-note{color:#7a5a20;font-weight:700}
@@ -123,6 +124,30 @@ body.detail-modal-open{overflow:hidden}
   .wonder-settings{height:auto!important;min-height:0!important;flex-wrap:wrap}.wonder-settings .convert-toggle{height:auto;min-height:44px;padding:7px 11px}#panel-prod>.settings{height:auto;min-height:0}
   .note{width:100%;max-width:100%;white-space:normal}.detail-modal{align-items:flex-end;padding:0}.detail-sheet{width:100%;max-height:90vh;border-radius:14px 14px 0 0;padding:12px 10px 14px}.detail-tabs{grid-template-columns:repeat(2,1fr)}.detail-tab{min-height:44px;font-size:13px}.detail-toolbar{grid-template-columns:1fr}.detail-row{grid-template-columns:1fr 1fr}.detail-row .detail-field input,.detail-row .detail-field select{min-height:44px;font-size:16px}
   .happiness-combo{grid-template-columns:minmax(0,1fr) 30px}.happiness-combo .happiness-toggle{width:30px;min-width:30px;font-size:13px}.happiness-option{min-height:40px;font-size:14px}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-bottom:0}.tab,.tab.active,.tab:not(.active){margin:0;border:1px solid var(--border);border-radius:8px;min-height:44px}
+  #panel-prod>.settings,.wonder-settings,.sleep-settings{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:100%!important;height:auto!important;min-height:0!important;gap:7px 9px;align-items:center}
+  #panel-prod>.settings label,.wonder-settings label,.sleep-settings label{white-space:normal}
+  #panel-prod>.settings>select,#panel-prod>.settings>.step-wrap,.wonder-settings>.step-wrap,.sleep-settings>.step-wrap,.sleep-settings>select{width:100%!important;min-width:0}
+  #panel-prod>.settings .step-wrap input,.wonder-settings .step-wrap input,.sleep-settings .step-wrap input{width:100%!important;min-width:0;font-size:16px;min-height:44px}
+  #panel-prod>.settings select,.sleep-settings select{width:100%;font-size:16px;min-height:44px}
+  #panel-prod>.settings .reset-btn{grid-column:1/2;min-height:44px}.reset-status{align-self:center}
+  .sleep-cycle-actual{width:100%;font-size:12px;padding:8px 10px}
+  #tResource,#tProduct,#tGoal,#tSleep,#tPower{display:block;width:100%!important;min-width:0!important;table-layout:auto!important}
+  #tResource thead,#tProduct thead,#tGoal thead,#tSleep thead,#tPower thead{display:none}
+  #tResource tbody,#tProduct tbody,#tGoal tbody,#tSleep tbody,#tPower tbody{display:block}
+  #tResource tbody tr,#tProduct tbody tr,#tGoal tbody tr,#tSleep tbody tr,#tPower tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 10px;border:1px solid var(--border);border-radius:9px;overflow:hidden;background:var(--panel)}
+  #tResource tbody td,#tProduct tbody td,#tGoal tbody td,#tSleep tbody td,#tPower tbody td{position:static!important;display:flex;flex-direction:column;justify-content:center;gap:3px;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;min-height:58px!important;padding:7px 8px!important;line-height:1.35!important;border:0!important;border-right:1px solid var(--border)!important;border-bottom:1px solid var(--border)!important;text-align:center}
+  #tResource tbody td:nth-child(2n+1):not(:first-child),#tProduct tbody td:nth-child(2n+1):not(:first-child),#tGoal tbody td:nth-child(2n+1):not(:first-child),#tSleep tbody td:nth-child(2n+1):not(:first-child),#tPower tbody td:nth-child(2n+1):not(:first-child){border-right:0!important}
+  #tResource tbody td:last-child,#tProduct tbody td:last-child,#tGoal tbody td:last-child,#tSleep tbody td:last-child,#tPower tbody td:last-child{border-bottom:0!important}
+  #tResource tbody td:first-child,#tProduct tbody td:first-child,#tGoal tbody td:first-child,#tSleep tbody td:first-child,#tPower tbody td:first-child{grid-column:1/-1;position:static!important;min-height:42px!important;align-items:flex-start;border-right:0!important;background:var(--soft)!important;font-size:14px}
+  #tResource tbody td:not(:first-child)::before,#tProduct tbody td:not(:first-child)::before,#tGoal tbody td:not(:first-child)::before,#tSleep tbody td:not(:first-child)::before,#tPower tbody td:not(:first-child)::before{display:block;color:var(--muted);font-size:10px;font-weight:800;line-height:1.2}
+  #tResource td:nth-child(2)::before,#tProduct td:nth-child(2)::before{content:"레벨"}#tResource td:nth-child(3)::before,#tProduct td:nth-child(3)::before{content:"생산 방식"}#tResource td:nth-child(4)::before,#tProduct td:nth-child(4)::before{content:"건물 수"}#tResource td:nth-child(5)::before,#tProduct td:nth-child(5)::before{content:"행복도(%)"}#tResource td:nth-child(6)::before,#tProduct td:nth-child(6)::before{content:"운영 시간(h)"}#tResource td:nth-child(7)::before,#tProduct td:nth-child(7)::before{content:"현재 보유량"}#tResource td:nth-child(8)::before{content:"잔여/부족"}#tResource td:nth-child(9)::before{content:"예상 생산량"}#tResource td:nth-child(10)::before{content:"상품 소비량"}#tResource td:nth-child(11)::before{content:"소요 시간(h)"}
+  #tProduct td:nth-child(8)::before{content:"예상 생산량"}#tProduct td:nth-child(9)::before{content:"화폐 사용량"}#tProduct td:nth-child(10)::before{content:"파피루스 사용량"}#tProduct td:nth-child(11)::before{content:"금 사용량"}
+  #tGoal td:nth-child(2)::before{content:"잔여/부족"}#tGoal td:nth-child(3)::before{content:"구간 필요량"}#tGoal td:nth-child(4)::before{content:"현재 보유량"}#tGoal td:nth-child(5)::before{content:"예상 생산량"}#tGoal td:nth-child(6)::before{content:"예상 보유량"}#tGoal td:nth-child(7)::before{content:"소요 시간(h)"}
+  #tSleep td:nth-child(2)::before{content:"생산력 차이"}#tSleep td:nth-child(3)::before{content:"현재 생산력"}#tSleep td:nth-child(4)::before{content:"필요 생산력"}#tSleep td:nth-child(5)::before{content:"필요량"}#tSleep td:nth-child(6)::before{content:"예상 확보량"}#tSleep td:nth-child(7)::before{content:"잔여/부족"}
+  #tPower td:nth-child(2)::before{content:"생산력 차이"}#tPower td:nth-child(3)::before{content:"현재 생산력"}#tPower td:nth-child(4)::before{content:"필요 생산력"}#tPower td:nth-child(5)::before{content:"기준 필요량"}
+  #tResource input,#tResource select,#tProduct input,#tProduct select{font-size:16px;min-height:40px}
+  #tConvert{min-width:600px!important}
 }
 </style>
 </head>
@@ -223,6 +248,7 @@ body.detail-modal-open{overflow:hidden}
     <label for="sleepCount">생산 횟수</label>
     <div class="step-wrap"><input id="sleepCount" class="step-one" type="number" min="0" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
   </div>
+  <div id="sleepCycleActual" class="sleep-cycle-actual" aria-live="polite"></div>
   <div class="table-wrap"><table id="tSleep"><thead><tr>
     <th>자원</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>필요량</th><th>예상 확보량</th><th>잔여/부족</th>
   </tr></thead><tbody></tbody></table></div>
@@ -240,7 +266,7 @@ body.detail-modal-open{overflow:hidden}
   <div class="note">
     1. <b>목표 달성 현황</b>은 <b>현재 레벨</b>과 <b>목표 레벨</b>을 기준으로 필요한 상품량과 목표 달성 여부를 계산합니다. <b>소요 시간(h)</b>은 현재 보유량을 포함하여 부족한 상품이 처음 ‘잔여’가 되기까지 필요한 운영 시간입니다.<br>
     2. <b>수면 대비 자원 확보</b>는 수면까지 남은 시간과 수면 중 생산 주기·횟수를 기준으로, 현재 설정된 상품 생산에 필요한 파피루스·금과 현재 보유량을 반영하여 필요한 생산력을 계산합니다.<br>
-    3. <b>목표 레벨 생산력 비교</b>는 <b>현재 생산력</b>과 <b>목표 레벨 달성에 필요한 생산력</b>을 비교하여 <b>생산력 차이</b>를 계산합니다. 상품 부족분과 그 생산에 필요한 파피루스·금까지 반영합니다.<br>
+    3. <b>목표 레벨 생산력 비교</b>는 <b>현재 생산력</b>과 <b>목표 레벨 달성에 필요한 생산력</b>을 비교하여 <b>생산력 차이</b>를 계산합니다. 상품 부족분과 그 생산에 필요한 파피루스·금까지 반영합니다. 상품 필요 생산력은 <b>부족 수량 기준</b>으로 환산하고, 자원 기준 필요량은 실제 상품 생산처럼 <b>완료된 1회 생산 단위로 올림</b>하여 계산합니다.<br>
     ※ <span class="happy-highlight"><b>생산력</b></span>은 각 생산 항목의 <span class="happy-highlight"><b>Lv6 최단 일반 생산을 100</b></span>으로 환산한 지수입니다. <b>현재 생산력</b>은 현재 설정된 건물 구성의 생산 능력이며, <b>필요 생산력</b>은 현재 보유량을 고려해 목표 달성에 필요한 생산 능력입니다.
   </div>
 </section>
@@ -394,7 +420,6 @@ function renderBonus(){
   const b=bonusInfo(),w=workerInfo(),bonus=[];
   if(app.settings.wonder==='호루스의 신전'){
     bonus.push('금 +'+fmtPct(num(b.bonus,0)));
-    bonus.push('화폐 +'+fmtPct(horusDebenBonus()));
   }else{
     const target=b.target||'—';
     if(target!=='—'&&num(b.bonus,0))bonus.push(target+' +'+fmtPct(num(b.bonus,0)));
@@ -463,6 +488,22 @@ function sleepRequirementForProduct(name,raw){
   const s=app.products[name],r=sleepRecipe(name,s.lv);if(!r||r.p.raw!==raw)return 0;return r.cycles*r.p.rawUse*s.bldgs
 }
 function sleepRawRequirement(raw){return productOrder.reduce((sum,n)=>sum+sleepRequirementForProduct(n,raw),0)}
+function sleepAppliedCycleSummary(){
+  const parts=[];
+  for(const name of productOrder){
+    const modes=new Set();
+    if(detailEnabled(name)){
+      for(const row of app.details[name].rows){
+        if(Math.max(0,num(row.count,0))<=0)continue;
+        const r=sleepRecipe(name,row.lv);if(r)modes.add(r.mode)
+      }
+    }else if(Math.max(0,num(app.products[name].bldgs,0))>0){
+      const r=sleepRecipe(name,app.products[name].lv);if(r)modes.add(r.mode)
+    }
+    if(modes.size)parts.push(displayName(name)+' '+[...modes].join('·'))
+  }
+  return parts.length?'실제 적용 생산 주기 · '+parts.join(' · '):'실제 적용 생산 주기 · 생산 건물 없음'
+}
 function sleepPrepHours(){return app.settings.sleepPrepH===''?Math.max(0,num(app.settings.baseH,0)):Math.max(0,num(app.settings.sleepPrepH,0))}
 function resourceBenchmarkRate(name){
   const p=infoResource(name,6);if(!p)return 0;
@@ -496,7 +537,7 @@ function sleepRow(name){
   const a=sleepResourcePower(name),shownDiff=a.diff===null?null:Math.round(a.diff*10)/10,cls=shownDiff===null?'':(shownDiff<0?'remain-bad':'remain-ok');
   return '<tr><td class="name">'+name+'</td><td class="num calc '+cls+'">'+(a.diff===null?'준비 시간 확인':fmtSignedPower(a.diff))+'</td><td class="num calc">'+fmtPower(a.current)+'</td><td class="num calc">'+(a.needed===null?'—':fmtPower(a.needed))+'</td><td class="num calc">'+fmtQty(a.sleepNeed)+'</td><td class="num calc">'+fmtQty(a.projected)+'</td><td class="num calc">'+fmtQty(a.remain)+'</td></tr>'
 }
-function renderSleepReserve(){document.querySelector('#tSleep tbody').innerHTML=resourceOrder.map(sleepRow).join('')}
+function renderSleepReserve(){document.querySelector('#tSleep tbody').innerHTML=resourceOrder.map(sleepRow).join('');document.getElementById('sleepCycleActual').textContent=sleepAppliedCycleSummary()}
 
 function productBenchmarkRate(name){
   const p=infoProduct(name,6,'30분');if(!p)return 0;
