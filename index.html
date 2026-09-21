@@ -444,9 +444,8 @@ function renderBonus(){
     :'';
   document.getElementById('bonusBox').innerHTML=
     '<div class="bonus-item"><span>생산 보너스</span><b>'+(bonus.length?bonus.join(' · '):'없음')+'</b></div>'+
-    horusPapyrusNote+
     '<div class="bonus-item"><span>추가 일꾼 수</span><b>'+fmtQty(num(w.workers,0))+'명</b></div>'+
-    '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b></div>';
+    '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b>'+horusPapyrusNote+'</div>';
 }
 function resourceRow(name){
   const s=app.resources[name],prod=resourceOutput(name),cons=rawConsumption(name),remain=num(s.stock,0)+prod-cons,time=resourceRequiredHours(name,cons),detail=resourceDetailEnabled(name);
