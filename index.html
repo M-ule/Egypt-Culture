@@ -10,12 +10,12 @@
 :root{
   --font:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
   --main-width:1100px;
-  --primary:#17546b;--primary-2:#b88b35;--primary-dark:#0d3f51;
-  --page:#eee5cf;--panel:#fffdf7;--text:#3d392f;--muted:#746c5d;
-  --border:#b9a679;--soft:#e8d9b7;--soft-2:#f7f1e2;
+  --primary:#176b87;--primary-2:#c69b3c;--primary-dark:#0d4658;
+  --page:#eee3c7;--panel:#fffaf0;--text:#40382a;--muted:#756954;
+  --border:#b79a60;--soft:#ead8a8;--soft-2:#f8f0dc;
   --input:#fff0b8;--input-border:#c69a32;--input-focus:#9b761c;
   --ok-bg:#d9f4e6;--ok:#17603f;--bad-bg:#fde2e2;--bad:#9a2929;
-  --nile:#2e7991;--gold:#bd913a;--papyrus:#697b53;
+  --nile:#2b7890;--gold:#c69b3c;--papyrus:#78805a;
 }
 *{box-sizing:border-box}
 body{font-family:var(--font);color:var(--text);background:var(--page);margin:0;padding:16px;font-size:13px}
@@ -32,12 +32,12 @@ h2{font-size:15px;margin:16px 0 8px;padding-left:8px;border-left:4px solid var(-
 .legend-item{display:flex;align-items:center;gap:5px}.legend-box{width:14px;height:14px;border-radius:3px;border:1px solid}
 .legend-input{background:var(--input);border-color:var(--input-border)}.legend-calc{background:var(--soft-2);border-color:var(--border)}
 .settings{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;background:var(--soft-2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;max-width:100%}
-.settings label{font-size:12px;font-weight:800;color:#465f5b;white-space:nowrap}.settings .spacer{flex:1 1 20px}
+.settings label{font-size:12px;font-weight:800;color:#5c503b;white-space:nowrap}.settings .spacer{flex:1 1 20px}
 #panel-prod>.settings,#panel-wonder>.wonder-settings{width:var(--main-width);max-width:100%;height:50px;min-height:50px}
 .wonder-settings{margin:0 0 8px;flex-wrap:nowrap}
 .sleep-settings{margin:0 0 8px;width:700px;max-width:100%;min-height:48px}
 .sleep-settings .sleep-time-wrap{width:92px}.sleep-settings .sleep-time-wrap input{width:72px;min-width:0}
-.bonus-box{display:flex;flex-wrap:wrap;gap:8px 18px;padding:9px 12px;background:#e1ebea;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:12px;max-width:100%;width:var(--main-width)}
+.bonus-box{display:flex;flex-wrap:wrap;gap:8px 18px;padding:9px 12px;background:#f2e5c4;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:12px;max-width:100%;width:var(--main-width)}
 .bonus-item{display:flex;gap:6px;align-items:baseline}.bonus-item b{color:var(--primary-dark)}
 .bonus-note{color:#7a5a20;font-weight:700}
 .table-wrap{overflow-x:auto;position:relative;max-width:100%}
@@ -47,16 +47,16 @@ th:first-child,td:first-child{border-left:1px solid var(--border)} thead tr:firs
 th{background:var(--primary);font-weight:800;font-size:11px;color:white;position:sticky;top:0;z-index:3}
 th:first-child{left:0;z-index:5}td:first-child{position:sticky;left:0;z-index:2}
 td.name{background:var(--soft);color:var(--primary-dark);font-weight:800}
-td.calc{background:var(--soft-2);color:#35525f}
+td.calc{background:var(--soft-2);color:#4e493c}
 td.input-cell,td.fixed-input{background:var(--input);padding:2px 4px;position:relative}
 td.input-cell::before,td.fixed-input::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--input-border)}
 td.fixed-input{padding:5px 8px}
 .num{font-variant-numeric:tabular-nums}
-input,select{font:inherit;font-size:12px;border:1px solid var(--input-border);background:#fff8d9;padding:4px 6px;border-radius:4px;width:100%;min-width:60px;color:#314844}
+input,select{font:inherit;font-size:12px;border:1px solid var(--input-border);background:#fff8d9;padding:4px 6px;border-radius:4px;width:100%;min-width:60px;color:#493f30}
 input:focus,select:focus{outline:none;border-color:var(--input-focus);box-shadow:0 0 0 2px rgba(155,118,28,.15)}
 input[type=number]{text-align:center}select{cursor:pointer;text-align:center;text-align-last:center}
 .settings input,.settings select{width:auto;min-width:90px}
-.setting-value{display:inline-flex;align-items:center;justify-content:center;min-width:90px;min-height:30px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--soft-2);color:#35525f;font-size:12px;white-space:nowrap}
+.setting-value{display:inline-flex;align-items:center;justify-content:center;min-width:90px;min-height:30px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--soft-2);color:#4e493c;font-size:12px;white-space:nowrap}
 .reset-btn{padding:6px 12px;background:#f7e0df;color:#8e2d2d;border:1px solid #e6b5b2;border-radius:5px;cursor:pointer;font:700 12px var(--font)}
 .reset-btn:hover{background:#efcccc}.reset-status{min-width:70px;font-size:12px;font-weight:800;color:var(--primary)}
 .remain-ok{background:var(--ok-bg)!important;color:var(--ok)!important;font-weight:800}.remain-bad{background:var(--bad-bg)!important;color:var(--bad)!important;font-weight:800}
@@ -65,23 +65,24 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 .step-wrap{display:flex;align-items:stretch;width:100%;min-width:72px}
 .step-wrap input{min-width:0;border-radius:4px 0 0 4px;border-right:0}
 .step-controls{width:20px;display:flex;flex-direction:column;flex:0 0 20px}
-.step-btn{flex:1;min-height:12px;padding:0;border:1px solid var(--input-border);background:#fff2bd;color:#58666e;font-size:8px;line-height:1;cursor:pointer}
+.step-btn{flex:1;min-height:12px;padding:0;border:1px solid var(--input-border);background:#fff2bd;color:#665a45;font-size:8px;line-height:1;cursor:pointer}
 .step-btn:first-child{border-radius:0 4px 0 0;border-bottom:0}.step-btn:last-child{border-radius:0 0 4px 0}
-.step-btn:hover{background:#ead992;color:#2a3f49}
+.step-btn:hover{background:#ead992;color:#4d402d}
 .step-one::-webkit-inner-spin-button,.step-one::-webkit-outer-spin-button,.stock-input::-webkit-inner-spin-button,.stock-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .step-one,.stock-input{-moz-appearance:textfield}
 .settings .step-wrap{width:92px}.settings .step-wrap input{width:72px;min-width:0}
 .section-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px;margin-bottom:8px}.section-title-row h2{margin:0}
 .detail-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.detail-open-btn,.convert-toggle{padding:7px 11px;background:#e1ebea;color:var(--primary-dark);border:1px solid var(--border);border-radius:6px;cursor:pointer;font:800 12px var(--font);min-height:36px;white-space:nowrap}
-.detail-open-btn:hover,.convert-toggle:hover{background:#cedfdd}.detail-summary{font-size:11px;color:var(--muted)}
-.detail-badge{display:inline-block;margin-left:4px;padding:1px 4px;border-radius:4px;background:#dcecf4;color:#235269;font-size:9px;font-weight:900;vertical-align:1px}
-.detail-active-cell{background:#e4f0f5!important;color:#24566c!important;font-weight:800}
+.detail-open-btn,.convert-toggle{padding:7px 11px;background:#f2e5c4;color:var(--primary-dark);border:1px solid var(--border);border-radius:6px;cursor:pointer;font:800 12px var(--font);min-height:36px;white-space:nowrap}
+.detail-open-btn:hover,.convert-toggle:hover{background:#e7d3a5}.detail-summary{font-size:11px;color:var(--muted)}
+.detail-badge{display:inline-block;margin-left:4px;padding:1px 4px;border-radius:4px;background:#eadcbb;color:#6b5225;font-size:9px;font-weight:900;vertical-align:1px}
+.detail-active-cell{background:#f3e8cd!important;color:#6b5225!important;font-weight:800}
 .power-layout{display:flex;align-items:flex-start;gap:8px;margin-top:8px}.power-main{flex:0 0 auto}.power-side{flex:0 0 auto}.convert-panel[hidden]{display:none}
 .divider-top td{border-top:3px solid var(--primary-2)}
 /* 고정 표 규격 */
 #tResource,#tProduct{width:1100px!important;min-width:1100px!important}
-#tGoal,#tSleep,#tConvert{width:700px!important;min-width:700px!important}
+#tGoal,#tSleep{width:700px!important;min-width:700px!important}
+#tConvert{width:600px!important;min-width:600px!important}
 #tPower{width:500px!important;min-width:500px!important}
 #tResource,#tProduct,#tGoal,#tSleep,#tPower,#tConvert{table-layout:fixed!important;border-spacing:0!important}
 #tResource th,#tResource td,#tProduct th,#tProduct td,#tGoal th,#tGoal td,#tSleep th,#tSleep td,#tPower th,#tPower td,#tConvert th,#tConvert td{
@@ -91,21 +92,21 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 #tConvert tbody td:nth-child(n+3){font-weight:800!important}
 /* modal */
 .detail-modal[hidden]{display:none}.detail-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
-.detail-backdrop{position:absolute;inset:0;background:rgba(24,45,49,.48)}
+.detail-backdrop{position:absolute;inset:0;background:rgba(64,51,31,.48)}
 .detail-sheet{position:relative;z-index:1;width:min(860px,100%);max-height:88vh;overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:0 14px 40px rgba(0,0,0,.18)}
 .detail-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}.detail-head h3{font-size:16px;margin:0;color:var(--primary-dark)}.detail-head p{font-size:11px;margin:4px 0 0;color:var(--muted);line-height:1.5}
 .detail-close{width:40px;height:40px;border:1px solid var(--border);border-radius:8px;background:var(--soft-2);color:var(--primary);cursor:pointer;font-size:20px}
 .detail-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}.resource-detail-tabs{grid-template-columns:repeat(2,1fr)}
-.detail-tab{min-height:40px;border:1px solid var(--border);border-radius:7px;background:var(--soft-2);color:#465f5b;cursor:pointer;font:800 12px var(--font);padding:6px}
+.detail-tab{min-height:40px;border:1px solid var(--border);border-radius:7px;background:var(--soft-2);color:#5c503b;cursor:pointer;font:800 12px var(--font);padding:6px}
 .detail-tab.active{background:var(--primary);color:white;border-color:var(--primary)}.detail-tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-left:3px}.detail-tab.active .dot{background:white}
 .detail-toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;background:#f7f3e8;border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
-.detail-field{display:flex;flex-direction:column;gap:4px;min-width:0}.detail-field label{font-size:11px;font-weight:800;color:#465f5b}.detail-field input,.detail-field select{min-height:40px;font-size:14px}
+.detail-field{display:flex;flex-direction:column;gap:4px;min-width:0}.detail-field label{font-size:11px;font-weight:800;color:#5c503b}.detail-field input,.detail-field select{min-height:40px;font-size:14px}
 .detail-toggle-wrap{display:flex;align-items:center;gap:8px;min-height:40px}.detail-toggle-wrap input{width:18px;height:18px;min-width:18px}.detail-toggle-wrap label{font-size:12px;font-weight:800}
-.detail-help,.detail-result{font-size:11px;line-height:1.6;border-radius:7px;padding:8px 10px;margin-bottom:8px}.detail-help{color:#5c584d;background:#fff8d9;border:1px solid var(--input-border)}.detail-result{color:#465f5b;background:#e1ebea;border:1px solid var(--border)}
+.detail-help,.detail-result{font-size:11px;line-height:1.6;border-radius:7px;padding:8px 10px;margin-bottom:8px}.detail-help{color:#5c584d;background:#fff8d9;border:1px solid var(--input-border)}.detail-result{color:#5c503b;background:#f2e5c4;border:1px solid var(--border)}
 .detail-rows{display:flex;flex-direction:column;gap:7px}.detail-row{display:grid;grid-template-columns:.8fr 1.5fr 1fr 1fr auto;gap:7px;align-items:end;padding:9px;background:var(--soft-2);border:1px solid var(--border);border-radius:8px}
 .detail-row .detail-field input,.detail-row .detail-field select{background:#fff8d9}.detail-row-note{grid-column:1/-1;font-size:10px;color:var(--muted);line-height:1.45}
 .detail-remove{width:40px;height:40px;border:1px solid #e8b8b6;border-radius:7px;background:#f7e0df;color:#8e2d2d;cursor:pointer;font:900 16px var(--font)}
-.detail-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}.detail-add{min-height:40px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;background:#e1ebea;color:var(--primary);cursor:pointer;font:800 12px var(--font)}.detail-add:disabled{opacity:.45;cursor:not-allowed}.detail-disabled{opacity:.62}
+.detail-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}.detail-add{min-height:40px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;background:#f2e5c4;color:var(--primary);cursor:pointer;font:800 12px var(--font)}.detail-add:disabled{opacity:.45;cursor:not-allowed}.detail-disabled{opacity:.62}
 body.detail-modal-open{overflow:hidden}
 /* 행복도 자유 입력 + 추천값 */
 .happiness-combo{display:grid;grid-template-columns:minmax(0,1fr) 24px;align-items:stretch;width:100%;min-width:0;position:relative}
@@ -160,7 +161,7 @@ body.detail-modal-open{overflow:hidden}
       <div id="resourceDetailTabs" class="detail-tabs resource-detail-tabs"></div>
       <div class="detail-toolbar">
         <div class="detail-field"><label>상세 설정</label><div class="detail-toggle-wrap"><input type="checkbox" id="resourceDetailEnabled"><label for="resourceDetailEnabled">이 자원에 상세 설정 적용</label></div></div>
-        <div class="detail-field"><label>생산 방식</label><div class="setting-value">연속(6시간 기준)</div></div>
+        <div class="detail-field"><label>생산 방식</label><div class="setting-value">연속</div></div>
       </div>
       <div class="detail-help">화면 명칭은 편의를 위해 <b>행복도</b>로 표기합니다. 실제 이집트의 관개 효과를 계산하며, 0~100 사이 임의값을 입력할 수 있습니다.</div>
       <div id="resourceDetailResult" class="detail-result"></div>
@@ -191,10 +192,10 @@ body.detail-modal-open{overflow:hidden}
   </div>
 
   <div class="note">
-    1. <b>불가사의</b>와 <b>보너스 적용 레벨</b>을 입력하면 해당 불가사의의 생산 보너스와 추가 일꾼 수가 표시됩니다. 아부심벨은 파피루스, 대스핑크스는 금, 쿠푸왕의 피라미드는 화폐가 대상입니다. <b>호루스의 신전</b>은 금과 화폐를 강화하며, 선택 시 Ancient Egypt 전용 파피루스 기본 생산량(Lv1~6: 4,200 / 6,300 / 9,500 / 15,000 / 22,000 / 32,000)을 자동 적용합니다.<br>
-    2. <b>행복도</b>는 실제 이집트의 관개 효과입니다. 계산은 <b>시간당 추가량 = 버림(최대 행복도 × 행복도 비율 × 효과계수)</b>, <b>1회 생산량 = 버림(0% 기본량 + 시간당 추가량 × 생산시간)</b>의 이중 버림 공식을 사용합니다.<br>
-    3. 파피루스·금은 <b>연속 생산</b>으로 계산하며, 상품은 각 생산 주기가 완전히 끝난 횟수만 인정합니다. Lv1은 1분, Lv2는 5분·30분·1시간, Lv3 이상은 30분·1시간·2시간을 기본으로 하며 예복·황금 가면은 Lv4부터 생산됩니다.<br>
-    4. 화폐 생산 데이터는 현재 기준값에 포함되어 있지 않아 <b>상품별 화폐 사용량만 표시</b>합니다. 쿠푸왕의 피라미드와 호루스의 신전의 화폐 생산 보너스는 파피루스·금 생산량에 잘못 적용하지 않습니다.
+    1. <b>불가사의</b>와 <b>보너스 적용 레벨</b>을 입력하면 선택한 불가사의의 생산 보너스가 자동 반영됩니다. <b>일괄 운영 시간</b>은 일반 설정과 상세 설정에서 운영 시간을 비워둔 경우 적용됩니다.<br>
+    2. <b>자원</b>은 현재 보유량·예상 생산량·상품 생산에 필요한 사용량을 반영하여 잔여/부족과 소요 시간을 계산합니다.<br>
+    3. <b>상품</b>은 현재 설정된 생산 주기가 완전히 끝난 횟수를 기준으로 예상 생산량과 화폐·자원 사용량을 계산합니다.<br>
+    4. <b>행복도</b>는 이집트의 관개 효과를 뜻하며, 일반 설정과 상세 설정의 생산량 계산에 반영됩니다.
   </div>
 </section>
 
@@ -223,24 +224,24 @@ body.detail-modal-open{overflow:hidden}
     <div class="step-wrap"><input id="sleepCount" class="step-one" type="number" min="0" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
   </div>
   <div class="table-wrap"><table id="tSleep"><thead><tr>
-    <th>자원</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>수면 중 필요량</th><th>수면 시작 예상 보유량</th><th>잔여/부족</th>
+    <th>자원</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>필요량</th><th>예상 확보량</th><th>잔여/부족</th>
   </tr></thead><tbody></tbody></table></div>
 
   <div class="section-title-row"><h2>목표 레벨 생산력 비교</h2></div>
   <div class="power-layout">
     <div class="power-main"><div class="table-wrap"><table id="tPower"><thead><tr>
-      <th>항목</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>잔여/부족</th>
+      <th>생산 항목</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>기준 필요량</th>
     </tr></thead><tbody></tbody></table></div></div>
     <div class="power-side"><div id="convertPanel" class="convert-panel" hidden><div class="table-wrap"><table id="tConvert"><thead><tr>
-      <th>항목</th><th>생산 방식</th><th>Lv2</th><th>Lv3</th><th>Lv4</th><th>Lv5</th><th>Lv6</th>
+      <th>생산 항목</th><th>생산 방식</th><th>Lv3</th><th>Lv4</th><th>Lv5</th><th>Lv6</th>
     </tr></thead><tbody></tbody></table></div></div></div>
   </div>
 
   <div class="note">
-    1. <b>목표 달성 현황</b>은 현재 레벨부터 목표 레벨까지 필요한 공통 불가사의 요구량을 합산해 계산합니다.<br>
-    2. <b>수면 대비 자원 확보</b>는 수면 전 상품 생산에 쓰이는 자원과 수면 중 지정한 생산 횟수에 필요한 파피루스·금을 함께 반영합니다. 선택한 생산 주기를 해당 레벨이 지원하지 않으면 그 레벨에서 가능한 가장 긴 생산 방식을 사용합니다.<br>
-    3. <b>생산력</b>은 <span class="happy-highlight">행복도 100%의 Lv6 건물 1개를 100</span>으로 둔 지수입니다. 현재 건물 구성과 목표 달성에 필요한 생산 능력을 같은 기준으로 비교합니다.<br>
-    4. 화폐는 생산 기준값이 없어 생산력 비교 대상에서 제외되며, 상품 생산에 필요한 화폐 사용량은 생산 계산기에서 별도로 확인할 수 있습니다.
+    1. <b>목표 달성 현황</b>은 <b>현재 레벨</b>과 <b>목표 레벨</b>을 기준으로 필요한 상품량과 목표 달성 여부를 계산합니다. <b>소요 시간(h)</b>은 현재 보유량을 포함하여 부족한 상품이 처음 ‘잔여’가 되기까지 필요한 운영 시간입니다.<br>
+    2. <b>수면 대비 자원 확보</b>는 수면까지 남은 시간과 수면 중 생산 주기·횟수를 기준으로, 현재 설정된 상품 생산에 필요한 파피루스·금과 현재 보유량을 반영하여 필요한 생산력을 계산합니다.<br>
+    3. <b>목표 레벨 생산력 비교</b>는 <b>현재 생산력</b>과 <b>목표 레벨 달성에 필요한 생산력</b>을 비교하여 <b>생산력 차이</b>를 계산합니다. 상품 부족분과 그 생산에 필요한 파피루스·금까지 반영합니다.<br>
+    ※ <b>생산력</b>은 상품은 <b>Lv6·행복도 100%·30분 생산 1개를 100</b>, 자원은 <b>Lv6·행복도 100% 연속 생산 1개를 100</b>으로 환산한 지수입니다. <b>현재 생산력</b>은 현재 설정된 건물 구성의 생산 능력이며, <b>필요 생산력</b>은 현재 보유량을 고려해 목표 달성에 필요한 생산 능력입니다.
   </div>
 </section>
 
@@ -381,7 +382,7 @@ function productCycleMinutes(name){
 function wonderNeed(product){if(app.wonder.tgt<=app.wonder.cur)return 0;let sum=0;for(let lv=app.wonder.cur+1;lv<=app.wonder.tgt;lv++)sum+=num(WONDER[String(lv)]?.[product],0);return sum}
 function wonderTime(product){const shortfall=Math.max(0,wonderNeed(product)-num(app.products[product].stock,0));if(shortfall===0)return 0;const perCycle=productPerCycleOutput(product),cycleMin=productCycleMinutes(product);if(perCycle<=0||!cycleMin)return null;return Math.ceil(shortfall/perCycle-1e-12)*(cycleMin/60)}
 
-function remainClass(v){return v>=-1e-10?'remain-ok':'remain-bad'}
+function remainClass(v){const shown=Math.round(tidyZero(num(v,0)));return shown>=0?'remain-ok':'remain-bad'}
 function stepper(k,value,placeholder=''){const val=value===''?'':value;return '<div class="step-wrap"><input type="number" class="step-one" data-k="'+k+'" value="'+val+'" step="any" min="0"'+(placeholder?' placeholder="'+placeholder+'"':'')+'><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 function levelStepper(value,min=1,max=6){return '<div class="step-wrap"><input type="number" class="step-one" data-k="lv" value="'+value+'" step="1" min="'+min+'" max="'+max+'"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 function happinessInput(k,value,attr='data-k'){const v=normalizedHappiness(value,100);return '<div class="happiness-combo"><input type="text" class="happiness-input" inputmode="decimal" autocomplete="off" '+attr+'="'+k+'" value="'+v+'" aria-label="행복도 퍼센트"><button type="button" class="happiness-toggle" aria-label="행복도 추천값 보기" aria-haspopup="listbox" aria-expanded="false">▼</button></div>'}
@@ -389,22 +390,18 @@ function detailCountStepper(attr,value){return '<div class="step-wrap"><input ty
 function detailHoursStepper(attr,value){const v=normalizedDetailHours(value);return '<div class="step-wrap"><input type="number" class="step-one" min="0" step="any" '+attr+'="hours" value="'+v+'" placeholder="일괄"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 
 function renderBonus(){
-  const b=bonusInfo(),w=workerInfo(),target=b.target||'—';
+  const b=bonusInfo(),w=workerInfo(),bonus=[];
   if(app.settings.wonder==='호루스의 신전'){
-    document.getElementById('bonusBox').innerHTML=
-      '<div class="bonus-item"><span>금 생산 보너스</span><b>'+fmtPct(num(b.bonus,0))+'</b></div>'+
-      '<div class="bonus-item"><span>화폐 생산 보너스</span><b>'+fmtPct(horusDebenBonus())+'</b></div>'+
-      '<div class="bonus-item"><span>추가 일꾼 수</span><b>'+fmtQty(num(w.workers,0))+'명</b></div>'+
-      '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b></div>'+
-      '<div class="bonus-item bonus-note">호루스 선택 시 Ancient Egypt 파피루스 기본 생산량 적용 · 화폐 보너스는 생산표 미적용</div>';
-    return;
+    bonus.push('금 +'+fmtPct(num(b.bonus,0)));
+    bonus.push('화폐 +'+fmtPct(horusDebenBonus()));
+  }else{
+    const target=b.target||'—';
+    if(target!=='—'&&num(b.bonus,0))bonus.push(target+' +'+fmtPct(num(b.bonus,0)));
   }
-  const note=target==='화폐'?'<div class="bonus-item bonus-note">화폐 생산 데이터 미포함 · 생산표에는 미적용</div>':'';
   document.getElementById('bonusBox').innerHTML=
-    '<div class="bonus-item"><span>생산 보너스</span><b>'+fmtPct(num(b.bonus,0))+'</b></div>'+
-    '<div class="bonus-item"><span>보너스 대상</span><b>'+target+'</b></div>'+
+    '<div class="bonus-item"><span>생산 보너스</span><b>'+(bonus.length?bonus.join(' · '):'없음')+'</b></div>'+
     '<div class="bonus-item"><span>추가 일꾼 수</span><b>'+fmtQty(num(w.workers,0))+'명</b></div>'+
-    '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b></div>'+note
+    '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b></div>';
 }
 function resourceRow(name){
   const s=app.resources[name],prod=resourceOutput(name),cons=rawConsumption(name),remain=num(s.stock,0)+prod-cons,time=resourceRequiredHours(name,cons),detail=resourceDetailEnabled(name);
@@ -413,7 +410,7 @@ function resourceRow(name){
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
   const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'일괄')+'</td>';
   return '<tr data-group="resources" data-name="'+name+'"><td class="name">'+name+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+
-    '<td class="fixed-input">연속(6시간 기준)</td>'+bldgCell+happyCell+hoursCell+
+    '<td class="fixed-input">연속</td>'+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td>'+
     '<td class="num calc '+remainClass(remain)+'">'+fmtQty(remain)+'</td><td class="num calc">'+fmtQty(prod)+'</td><td class="num calc">'+fmtQty(cons)+'</td><td class="num calc">'+fmtHours(time)+'</td></tr>'
 }
@@ -466,57 +463,126 @@ function sleepRequirementForProduct(name,raw){
 }
 function sleepRawRequirement(raw){return productOrder.reduce((sum,n)=>sum+sleepRequirementForProduct(n,raw),0)}
 function sleepPrepHours(){return app.settings.sleepPrepH===''?Math.max(0,num(app.settings.baseH,0)):Math.max(0,num(app.settings.sleepPrepH,0))}
-function resourceLv6PerBuildingOutputForHours(name,h){const p=infoResource(name,6);return continuousOutput(p,h,1,100,resourceWonderMultiplier(name))}
-function resourceCurrentLv6Equivalent(name){
-  const h=effectiveHours('resources',name);if(h>0){const ref=resourceLv6PerBuildingOutputForHours(name,h);return ref>0?resourceOutputForHours(name,h)/ref:0}
-  const ref=resourceLv6PerBuildingOutputForHours(name,1);return ref>0?resourceOutputForHours(name,1)/ref:0
+function resourceBenchmarkRate(name){
+  const p=infoResource(name,6);if(!p)return 0;
+  return continuousOutput(p,1,1,100,resourceWonderMultiplier(name))
 }
+function resourceConfigRate(name,lv,happiness){
+  const p=infoResource(name,lv);if(!p)return 0;
+  return continuousOutput(p,1,1,happiness,resourceWonderMultiplier(name))
+}
+function resourceCurrentPower(name){
+  const ref=resourceBenchmarkRate(name);if(!(ref>0))return null;
+  let rate=0;
+  if(resourceDetailEnabled(name)){
+    rate=app.resourceDetails[name].rows.reduce((sum,row)=>sum+resourceConfigRate(name,row.lv,row.irrigation)*Math.max(0,num(row.count,0)),0)
+  }else{
+    const s=app.resources[name];rate=resourceConfigRate(name,s.lv,s.irrigation)*Math.max(0,num(s.bldgs,0))
+  }
+  return rate/ref*100
+}
+function resourceLv6PerBuildingOutputForHours(name,h){return resourceBenchmarkRate(name)*Math.max(0,num(h,0))}
+function resourceCurrentLv6Equivalent(name){const p=resourceCurrentPower(name);return Number.isFinite(p)?p/100:0}
+
 function sleepResourcePower(name){
   const h=sleepPrepHours(),prepProd=resourceOutputForHours(name,h),prepUse=productOrder.reduce((s,n)=>s+productUseForHours(n,name,h),0),sleepNeed=sleepRawRequirement(name),stock=num(app.resources[name].stock,0),projected=stock+prepProd-prepUse,remain=projected-sleepNeed,requiredProduction=Math.max(0,prepUse+sleepNeed-stock);
-  const ref=resourceLv6PerBuildingOutputForHours(name,h),current=ref>0?prepProd/ref*100:resourceCurrentLv6Equivalent(name)*100;
+  const ref=resourceLv6PerBuildingOutputForHours(name,h),current=Number.isFinite(resourceCurrentPower(name))?resourceCurrentPower(name):0;
   if(requiredProduction<=1e-10)return {current,needed:0,diff:current,sleepNeed,projected,remain};
   if(!(ref>0))return {current,needed:null,diff:null,sleepNeed,projected,remain};
   const needed=requiredProduction/ref*100;return {current,needed,diff:current-needed,sleepNeed,projected,remain}
 }
-function sleepRow(name){const a=sleepResourcePower(name),cls=a.diff===null?'':remainClass(a.diff);return '<tr><td class="name">'+name+'</td><td class="num calc '+cls+'">'+(a.diff===null?'준비 시간 확인':fmtSignedPower(a.diff))+'</td><td class="num calc">'+fmtPower(a.current)+'</td><td class="num calc">'+(a.needed===null?'—':fmtPower(a.needed))+'</td><td class="num calc">'+fmtQty(a.sleepNeed)+'</td><td class="num calc">'+fmtQty(a.projected)+'</td><td class="num calc '+remainClass(a.remain)+'">'+fmtQty(a.remain)+'</td></tr>'}
+function sleepRow(name){
+  const a=sleepResourcePower(name),shownDiff=a.diff===null?null:Math.round(a.diff*10)/10,cls=shownDiff===null?'':(shownDiff<0?'remain-bad':'remain-ok');
+  return '<tr><td class="name">'+name+'</td><td class="num calc '+cls+'">'+(a.diff===null?'준비 시간 확인':fmtSignedPower(a.diff))+'</td><td class="num calc">'+fmtPower(a.current)+'</td><td class="num calc">'+(a.needed===null?'—':fmtPower(a.needed))+'</td><td class="num calc">'+fmtQty(a.sleepNeed)+'</td><td class="num calc">'+fmtQty(a.projected)+'</td><td class="num calc">'+fmtQty(a.remain)+'</td></tr>'
+}
 function renderSleepReserve(){document.querySelector('#tSleep tbody').innerHTML=resourceOrder.map(sleepRow).join('')}
 
-function productLv6PerBuildingOutput(name){
-  const h=effectiveHours('products',name),p=infoProduct(name,6,app.products[name].mode);if(!p||h<=0)return 0;return cyclicOutput(p,h,1,100)
+function productBenchmarkRate(name){
+  const p=infoProduct(name,6,'30분');if(!p)return 0;
+  return happyCycleOutput(p,100)/(p.min/60)
 }
-function productLv6PerBuildingUse(name,raw){
-  const h=effectiveHours('products',name),p=infoProduct(name,6,app.products[name].mode);if(!p||h<=0)return 0;return cyclicUse(p,h,1,raw)
+function productConfigRate(name,lv,mode,happiness){
+  const p=infoProduct(name,lv,mode);if(!p)return 0;
+  return happyCycleOutput(p,happiness)/(p.min/60)
 }
-function productCurrentLv6Equivalent(name){const ref=productLv6PerBuildingOutput(name);return ref>0?productOutput(name)/ref:0}
-function resourceLv6PerBuildingOutput(name){const h=effectiveHours('resources',name);return h>0?resourceLv6PerBuildingOutputForHours(name,h):0}
-function productAdjustment(name){
-  const current=productCurrentLv6Equivalent(name),remain=num(app.products[name].stock,0)+productOutput(name)-wonderNeed(name),perBuilding=productLv6PerBuildingOutput(name);
-  if(remain<0){if(perBuilding<=0)return {kind:'상품',name,remain,current,status:'warn'};const rawDelta=(-remain)/perBuilding,suggested=ceil2(current+rawDelta);return {kind:'상품',name,remain,current,suggested,status:'up'}}
-  if(remain>0&&perBuilding>0&&current>0){const rawReducible=Math.min(current,remain/perBuilding),suggested=ceil2(Math.max(0,current-rawReducible));return {kind:'상품',name,remain,current,suggested,status:'down'}}
-  return {kind:'상품',name,remain,current,suggested:ceil2(current),status:'keep'}
+function productCurrentPower(name){
+  const ref=productBenchmarkRate(name);if(!(ref>0))return null;
+  let rate=0;
+  if(detailEnabled(name)){
+    rate=app.details[name].rows.reduce((sum,row)=>sum+productConfigRate(name,row.lv,app.products[name].mode,row.irrigation)*Math.max(0,num(row.count,0)),0)
+  }else{
+    const s=app.products[name];rate=productConfigRate(name,s.lv,s.mode,s.irrigation)*Math.max(0,num(s.bldgs,0))
+  }
+  return rate/ref*100
 }
-function adjustedRawConsumption(pa){
-  const total=Object.fromEntries(resourceOrder.map(r=>[r,rawConsumption(r)]));
-  for(const name of productOrder){const a=pa[name];if(a&&a.status==='up'&&Number.isFinite(a.suggested)&&Number.isFinite(a.current)){const inc=Math.max(0,a.suggested-a.current);for(const raw of resourceOrder)total[raw]+=inc*productLv6PerBuildingUse(name,raw)}}
+function productTargetNeed(name){return Math.max(0,wonderNeed(name)-num(app.products[name].stock,0))}
+function requiredPowerFromAmount(amount,hours,benchmarkRate){
+  amount=Math.max(0,num(amount,0));hours=Math.max(0,num(hours,0));
+  if(amount<=1e-10)return 0;
+  if(!(hours>0&&benchmarkRate>0))return null;
+  return amount/(benchmarkRate*hours)*100
+}
+function productRequiredPower(name){return requiredPowerFromAmount(productTargetNeed(name),effectiveHours('products',name),productBenchmarkRate(name))}
+function productTargetRecipe(name){
+  const selected=app.products[name].mode;
+  return infoProduct(name,6,selected)||infoProduct(name,6,'30분')
+}
+function rawRequirementForAmount(name,raw,amount){
+  amount=Math.max(0,num(amount,0));if(amount<=1e-10)return 0;
+  const p=productTargetRecipe(name);if(!p||p.raw!==raw)return p?0:null;
+  const per=happyCycleOutput(p,100);if(!(per>0))return null;
+  return Math.ceil(amount/per-1e-12)*p.rawUse
+}
+function targetRawRequirement(raw){
+  let total=0;
+  for(const name of productOrder){
+    const v=rawRequirementForAmount(name,raw,productTargetNeed(name));
+    if(v===null)return null;
+    total+=v
+  }
   return total
 }
-function resourceAdjustment(name,pa){
-  const current=resourceCurrentLv6Equivalent(name),adjusted=adjustedRawConsumption(pa),cons=num(adjusted[name],0),remain=num(app.resources[name].stock,0)+resourceOutput(name)-cons,perBuilding=resourceLv6PerBuildingOutput(name);
-  if(productOrder.some(p=>pa[p]?.status==='warn'))return {kind:'자원',name,remain:null,current,status:'warn'};
-  if(remain<0){if(perBuilding<=0)return {kind:'자원',name,remain,current,status:'warn'};const suggested=ceil2(current+(-remain)/perBuilding);return {kind:'자원',name,remain,current,suggested,status:'up'}}
-  if(remain>0&&perBuilding>0&&current>0){const reducible=Math.min(current,remain/perBuilding),suggested=ceil2(Math.max(0,current-reducible));return {kind:'자원',name,remain,current,suggested,status:'down'}}
-  return {kind:'자원',name,remain,current,suggested:ceil2(current),status:'keep'}
+function resourceTargetNeed(name){
+  const total=targetRawRequirement(name);if(total===null)return null;
+  return Math.max(0,total-num(app.resources[name].stock,0))
 }
-function currentPowerIndex(a){return Number.isFinite(a.current)?Math.max(0,a.current)*100:null}
-function requiredPowerEquivalent(a){if(a.status==='warn'||a.remain===null||!Number.isFinite(a.current))return null;const per=a.kind==='상품'?productLv6PerBuildingOutput(a.name):resourceLv6PerBuildingOutput(a.name);if(!(per>0))return null;return Math.max(0,a.current-(a.remain/per))}
-function requiredPowerIndex(a){const v=requiredPowerEquivalent(a);return Number.isFinite(v)?v*100:null}
-function powerDifferenceIndex(a){const c=currentPowerIndex(a),r=requiredPowerIndex(a);return Number.isFinite(c)&&Number.isFinite(r)?c-r:null}
-function adjustmentRow(a){const c=currentPowerIndex(a),r=requiredPowerIndex(a),d=powerDifferenceIndex(a),cls=d===null?'':remainClass(d),rowCls=a.kind==='상품'&&a.name===productOrder[0]?' class="divider-top"':'';return '<tr'+rowCls+'><td class="name">'+a.name+'</td><td class="num calc '+cls+'">'+(d===null?'—':fmtSignedPower(d))+'</td><td class="num calc">'+(c===null?'—':fmtPower(c))+'</td><td class="num calc">'+(r===null?'—':fmtPower(r))+'</td><td class="num calc">'+(a.remain===null?'—':fmtQty(a.remain))+'</td></tr>'}
-function renderAdjustment(){const pa={};productOrder.forEach(n=>pa[n]=productAdjustment(n));const rows=[...resourceOrder.map(n=>resourceAdjustment(n,pa)),...productOrder.map(n=>pa[n])];document.querySelector('#tPower tbody').innerHTML=rows.map(adjustmentRow).join('')}
+function resourceRequiredPower(name){
+  const need=resourceTargetNeed(name);if(need===null)return null;
+  return requiredPowerFromAmount(need,effectiveHours('resources',name),resourceBenchmarkRate(name))
+}
+function productAdjustment(name){
+  const current=productCurrentPower(name),needed=productRequiredPower(name),basisNeed=productTargetNeed(name);
+  return {kind:'상품',name,current,needed,basisNeed,diff:Number.isFinite(current)&&Number.isFinite(needed)?current-needed:null}
+}
+function resourceAdjustment(name){
+  const current=resourceCurrentPower(name),needed=resourceRequiredPower(name),basisNeed=resourceTargetNeed(name);
+  return {kind:'자원',name,current,needed,basisNeed,diff:Number.isFinite(current)&&Number.isFinite(needed)?current-needed:null}
+}
+function currentPowerIndex(a){return Number.isFinite(a.current)?Math.max(0,a.current):null}
+function requiredPowerIndex(a){return Number.isFinite(a.needed)?Math.max(0,a.needed):null}
+function powerDifferenceIndex(a){return Number.isFinite(a.diff)?a.diff:null}
+function adjustmentRow(a){
+  const c=currentPowerIndex(a),r=requiredPowerIndex(a),d=powerDifferenceIndex(a),shown=d===null?null:Math.round(d*10)/10,cls=shown===null?'':(shown<0?'remain-bad':'remain-ok'),rowCls=a.kind==='상품'&&a.name===productOrder[0]?' class="divider-top"':'';
+  return '<tr'+rowCls+'><td class="name">'+a.name+'</td><td class="num calc '+cls+'">'+(d===null?'—':fmtSignedPower(d))+'</td><td class="num calc">'+(c===null?'—':fmtPower(c))+'</td><td class="num calc">'+(r===null?'—':fmtPower(r))+'</td><td class="num calc">'+(a.basisNeed===null?'—':fmtQty(a.basisNeed))+'</td></tr>'
+}
+function renderAdjustment(){
+  const rows=[...resourceOrder.map(resourceAdjustment),...productOrder.map(productAdjustment)];
+  document.querySelector('#tPower tbody').innerHTML=rows.map(adjustmentRow).join('')
+}
 
-function productConversionRatio(name,lv){const mode=app.products[name].mode,cur=infoProduct(name,lv,mode),base=infoProduct(name,6,mode);if(!cur||!base)return null;const a=happyCycleOutput(cur,100),b=happyCycleOutput(base,100);return b>0?a/b:null}
-function resourceConversionRatio(name,lv){const cur=infoResource(name,lv),base=infoResource(name,6);if(!cur||!base)return null;const a=(cur.out0/(cur.min/60))+happinessBonusPerHour(cur,100),b=(base.out0/(base.min/60))+happinessBonusPerHour(base,100);return b>0?a/b:null}
-function conversionRow(kind,name){const isProduct=kind==='상품',mode=isProduct?app.products[name].mode:'연속',ratios=[2,3,4,5,6].map(lv=>isProduct?productConversionRatio(name,lv):resourceConversionRatio(name,lv)),rowCls=isProduct&&name===productOrder[0]?' class="divider-top"':'';return '<tr'+rowCls+'><td class="name">'+name+'</td><td class="calc">'+mode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'}
+function productConversionRatio(name,lv){
+  const cur=infoProduct(name,lv,app.products[name].mode),base=productBenchmarkRate(name);
+  if(!cur||!(base>0))return null;
+  return (happyCycleOutput(cur,100)/(cur.min/60))/base
+}
+function resourceConversionRatio(name,lv){
+  const base=resourceBenchmarkRate(name),rate=resourceConfigRate(name,lv,100);
+  return base>0?rate/base:null
+}
+function conversionRow(kind,name){
+  const isProduct=kind==='상품',mode=isProduct?app.products[name].mode:'연속',ratios=[3,4,5,6].map(lv=>isProduct?productConversionRatio(name,lv):resourceConversionRatio(name,lv)),rowCls=isProduct&&name===productOrder[0]?' class="divider-top"':'';
+  return '<tr'+rowCls+'><td class="name">'+name+'</td><td class="calc">'+mode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
+}
 function renderConversion(){document.querySelector('#tConvert tbody').innerHTML=[...resourceOrder.map(n=>conversionRow('자원',n)),...productOrder.map(n=>conversionRow('상품',n))].join('')}
 
 function renderResourceDetailLauncher(){const active=resourceOrder.filter(resourceDetailEnabled);document.getElementById('resourceDetailSummary').textContent=active.length?'상세 설정 적용: '+active.join(' · '):'상세 설정 미사용'}
@@ -618,7 +684,18 @@ function selfCheck(){
   if(Math.abs(num(d0,0)-0.025)>1e-9||Math.abs(num(d50,0)-0.25)>1e-9)bad.push('호루스 화폐 보너스 범위 오류');
   if(num(WORKERS['호루스의 신전']?.['50']?.workers,-1)!==24)bad.push('호루스 일꾼 Lv50 오류');
   app.settings.wonder=prevWonder;
-  if(bad.length)console.error('이집트 기준값 검증 실패',bad);else console.info('이집트/호루스 기준값 검증 통과');
+  for(const name of productOrder){
+    const ref=productBenchmarkRate(name),p=infoProduct(name,6,'30분');
+    if(!(ref>0&&p))bad.push(name+' 생산력 기준값 없음');
+    else if(Math.abs((happyCycleOutput(p,100)/(p.min/60))/ref*100-100)>1e-9)bad.push(name+' Lv6 30분 생산력 기준 오류');
+    if(rawRequirementForAmount(name,rawForProduct[name],0)!==0)bad.push(name+' 보유량 충족 시 자원 필요량 오류');
+  }
+  for(const name of resourceOrder){
+    const base=resourceBenchmarkRate(name),lv6=resourceConfigRate(name,6,100);
+    if(!(base>0)||Math.abs(base-lv6)>1e-9)bad.push(name+' Lv6 자원 생산력 기준 오류');
+  }
+  if(!(requiredPowerFromAmount(500,2,1000)<requiredPowerFromAmount(1000,2,1000)))bad.push('보유량 반영 필요 생산력 오류');
+  if(bad.length)console.error('이집트 기준값/생산력 검증 실패',bad);else console.info('이집트 기준값/생산력 검증 통과');
 }
 function postSize(){try{parent.postMessage({type:'wrks:viz:resize',height:document.documentElement.scrollHeight},'*')}catch(e){}}
 loadState();selfCheck();renderAll();if('ResizeObserver' in window)new ResizeObserver(postSize).observe(document.body)
