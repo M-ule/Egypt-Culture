@@ -420,6 +420,7 @@ function renderBonus(){
   const b=bonusInfo(),w=workerInfo(),bonus=[];
   if(app.settings.wonder==='호루스의 신전'){
     bonus.push('금 +'+fmtPct(num(b.bonus,0)));
+    bonus.push('화폐 +'+fmtPct(horusDebenBonus()));
   }else{
     const target=b.target||'—';
     if(target!=='—'&&num(b.bonus,0))bonus.push(target+' +'+fmtPct(num(b.bonus,0)));
