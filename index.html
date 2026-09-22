@@ -639,20 +639,31 @@ function renderAdjustment(){
   document.querySelector('#tPower tbody').innerHTML=rows.map(adjustmentRow).join('')
 }
 
-function productConversionRatio(name,lv){
-  const cur=infoProduct(name,lv,app.products[name].mode),base=productBenchmarkRate(name);
+function productConversionRatio(name,lv,mode){
+  const cur=infoProduct(name,lv,mode),base=productBenchmarkRate(name);
   if(!cur||!(base>0))return null;
   return (happyCycleOutput(cur,100)/(cur.min/60))/base
+}
+function productConversionModes(name){
+  if(!detailEnabled(name))return [app.products[name].mode];
+  const modes=[...new Set(app.details[name].rows.filter(r=>num(r.count,0)>0&&r.mode).map(r=>r.mode))];
+  if(!modes.length)return [app.products[name].mode];
+  return modes.sort((a,b)=>(modeMinutesValue(a)||Infinity)-(modeMinutesValue(b)||Infinity))
 }
 function resourceConversionRatio(name,lv){
   const base=resourceBenchmarkRate(name),rate=resourceConfigRate(name,lv,100);
   return base>0?rate/base:null
 }
-function conversionRow(kind,name){
-  const isProduct=kind==='상품',mode=isProduct?app.products[name].mode:'연속',ratios=[1,2,3,4,5,6].map(lv=>isProduct?productConversionRatio(name,lv):resourceConversionRatio(name,lv)),rowCls=isProduct&&name===productOrder[0]?' class="divider-top"':'';
-  return '<tr'+rowCls+'><td class="name">'+displayName(name)+'</td><td class="calc">'+mode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
+function conversionRow(kind,name,mode=null,rowCls=''){
+  const isProduct=kind==='상품',shownMode=isProduct?mode:'연속',ratios=[1,2,3,4,5,6].map(lv=>isProduct?productConversionRatio(name,lv,mode):resourceConversionRatio(name,lv));
+  return '<tr'+(rowCls?' class="'+rowCls+'"':'')+'><td class="name">'+displayName(name)+'</td><td class="calc">'+shownMode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
 }
-function renderConversion(){document.querySelector('#tConvert tbody').innerHTML=[...resourceOrder.map(n=>conversionRow('자원',n)),...productOrder.map(n=>conversionRow('상품',n))].join('')}
+function renderConversion(){
+  const resourceRows=resourceOrder.map(n=>conversionRow('자원',n));
+  const productRows=[];
+  productOrder.forEach((name,nameIndex)=>productConversionModes(name).forEach((mode,modeIndex)=>productRows.push(conversionRow('상품',name,mode,nameIndex===0&&modeIndex===0?'divider-top':''))));
+  document.querySelector('#tConvert tbody').innerHTML=[...resourceRows,...productRows].join('')
+}
 
 function renderResourceDetailLauncher(){const active=resourceOrder.filter(resourceDetailEnabled);document.getElementById('resourceDetailSummary').textContent=active.length?'상세 설정 적용: '+active.join(' · '):'상세 설정 미사용'}
 function resourceDetailRowHtml(name,row,index){return '<div class="detail-row" data-resource-detail-index="'+index+'"><div class="detail-field"><label>레벨</label><div class="step-wrap"><input type="number" class="step-one" data-resource-detail-k="lv" value="'+row.lv+'" min="1" max="6" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div></div><div class="detail-field"><label>건물 수</label>'+detailCountStepper('data-resource-detail-k',row.count)+'</div><div class="detail-field"><label>행복도(%)</label>'+happinessInput('irrigation',row.irrigation,'data-resource-detail-k')+'</div><div class="detail-field"><label>운영 시간(h)</label>'+detailHoursStepper('data-resource-detail-k',row.hours)+'</div><button type="button" class="detail-remove" data-resource-detail-remove="'+index+'" aria-label="구성 삭제">−</button></div>'}
