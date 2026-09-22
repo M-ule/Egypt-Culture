@@ -118,21 +118,16 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 .detail-remove{width:40px;height:40px;border:1px solid #e8b8b6;border-radius:7px;background:#f7e0df;color:#8e2d2d;cursor:pointer;font:900 16px var(--font)}
 .detail-footer{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}.detail-add{min-height:40px;padding:7px 12px;border:1px solid var(--border);border-radius:7px;background:var(--soft-2);color:#4a3f2c;cursor:pointer;font:800 12px var(--font)}.detail-add:disabled{opacity:.45;cursor:not-allowed}.detail-disabled{opacity:.62}
 body.detail-modal-open{overflow:hidden}
-/* 행복도 자유 입력 + 추천값 */
-.happiness-combo{display:grid;grid-template-columns:minmax(0,1fr) 24px;align-items:stretch;width:100%;min-width:0;position:relative}
-.happiness-combo .happiness-input{appearance:textfield;-moz-appearance:textfield;min-width:0;width:100%;text-align:center;border-radius:4px 0 0 4px}
-.happiness-combo .happiness-toggle{width:24px;min-width:24px;padding:0;border:1px solid var(--input-border);border-left:0;border-radius:0 4px 4px 0;background:#fff4c7;color:inherit;cursor:pointer;font:700 11px var(--font);line-height:1}
-.happiness-menu{position:fixed;z-index:4000;display:none;background:var(--panel);border:1px solid var(--input-border);border-radius:6px;box-shadow:0 8px 22px rgba(0,0,0,.16);padding:3px;max-height:220px;overflow:auto}
-.happiness-menu.open{display:block}.happiness-option{display:block;width:100%;min-height:30px;padding:4px 8px;border:0;border-radius:4px;background:transparent;color:inherit;text-align:center;cursor:pointer;font:700 12px var(--font)}
-.happiness-option:hover,.happiness-option:focus{background:var(--soft-2);outline:none}
-.detail-field .happiness-combo,.detail-field .happiness-combo .happiness-input,.detail-field .happiness-combo .happiness-toggle{min-height:40px}
+/* 행복도 자유 입력 */
+.happiness-combo{display:block;width:100%;min-width:0}
+.happiness-combo .happiness-input{appearance:textfield;-moz-appearance:textfield;min-width:0;width:100%;text-align:center;border-radius:4px}
+.detail-field .happiness-combo,.detail-field .happiness-combo .happiness-input{min-height:40px}
 @media(max-width:1260px){.power-layout{flex-direction:column;width:100%}.power-main,.power-side{width:100%}}
 @media(max-width:720px){
   body{padding:10px}h1{font-size:18px}.settings{gap:8px}.settings .spacer{display:none}.section-title-row{align-items:flex-start}.detail-actions{width:100%}
   .detail-open-btn,.convert-toggle{min-height:44px;font-size:13px}.sleep-settings{max-width:100%;padding:9px 10px;min-height:0}.sleep-settings label{flex:1 1 auto}.sleep-settings .sleep-time-wrap{width:104px}.sleep-settings .sleep-time-wrap input{width:78px;font-size:16px;min-height:44px}.sleep-settings .sleep-time-wrap .step-controls{width:26px;flex-basis:26px}.sleep-settings .sleep-time-wrap .step-btn{min-height:22px;font-size:10px}
   .wonder-settings{height:auto!important;min-height:0!important;flex-wrap:wrap}.wonder-settings .convert-toggle{height:auto;min-height:44px;padding:7px 11px}#panel-prod>.settings{height:auto;min-height:0}
   .note{width:100%;max-width:100%;white-space:normal}.detail-modal{align-items:flex-end;padding:0}.detail-sheet{width:100%;max-height:90vh;border-radius:14px 14px 0 0;padding:12px 10px 14px}.detail-tabs{grid-template-columns:repeat(2,1fr)}.detail-tab{min-height:44px;font-size:13px}.detail-toolbar{grid-template-columns:1fr}.detail-row{grid-template-columns:1fr 1fr}.detail-row .detail-field input,.detail-row .detail-field select{min-height:44px;font-size:16px}
-  .happiness-combo{grid-template-columns:minmax(0,1fr) 30px}.happiness-combo .happiness-toggle{width:30px;min-width:30px;font-size:13px}.happiness-option{min-height:40px;font-size:14px}
   .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-bottom:0}.tab,.tab.active,.tab:not(.active){margin:0;border:1px solid var(--border);border-radius:8px;min-height:44px}
   #panel-prod>.settings,.wonder-settings,.sleep-settings{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:100%!important;height:auto!important;min-height:0!important;gap:7px 9px;align-items:center}
   #panel-prod>.settings label,.wonder-settings label,.sleep-settings label{white-space:normal}
@@ -455,7 +450,7 @@ function wonderTime(product){
 function remainClass(v){const shown=Math.round(tidyZero(num(v,0)));return shown>=0?'remain-ok':'remain-bad'}
 function stepper(k,value,placeholder=''){const val=value===''?'':value;return '<div class="step-wrap"><input type="number" class="step-one" data-k="'+k+'" value="'+val+'" step="any" min="0"'+(placeholder?' placeholder="'+placeholder+'"':'')+'><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 function levelStepper(value,min=1,max=6){return '<div class="step-wrap"><input type="number" class="step-one" data-k="lv" value="'+value+'" step="1" min="'+min+'" max="'+max+'"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
-function happinessInput(k,value,attr='data-k'){const v=normalizedHappiness(value,100);return '<div class="happiness-combo"><input type="text" class="happiness-input" inputmode="decimal" autocomplete="off" '+attr+'="'+k+'" value="'+v+'" aria-label="행복도 퍼센트"><button type="button" class="happiness-toggle" aria-label="행복도 추천값 보기" aria-haspopup="listbox" aria-expanded="false">▼</button></div>'}
+function happinessInput(k,value,attr='data-k'){const v=normalizedHappiness(value,100);return '<div class="happiness-combo"><input type="text" class="happiness-input" inputmode="decimal" autocomplete="off" '+attr+'="'+k+'" value="'+v+'" aria-label="행복도 퍼센트"></div>'}
 function detailCountStepper(attr,value){return '<div class="step-wrap"><input type="number" class="step-one" min="0" step="1" '+attr+'="count" value="'+value+'"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 function detailHoursStepper(attr,value){const v=normalizedDetailHours(value);return '<div class="step-wrap"><input type="number" class="step-one" min="0" step="any" '+attr+'="hours" value="'+v+'" placeholder="일괄"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 
@@ -739,14 +734,6 @@ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!document.
 
 const convertToggle=document.getElementById('convertToggle'),convertPanel=document.getElementById('convertPanel');
 convertToggle.addEventListener('click',()=>{const open=convertPanel.hasAttribute('hidden');if(open){convertPanel.removeAttribute('hidden');convertToggle.textContent='생산력 환산표 접기';convertToggle.setAttribute('aria-expanded','true')}else{convertPanel.setAttribute('hidden','');convertToggle.textContent='생산력 환산표 보기';convertToggle.setAttribute('aria-expanded','false')}postSize()})
-
-let happinessActiveInput=null;
-function ensureHappinessMenu(){let menu=document.getElementById('happinessFloatingMenu');if(menu)return menu;menu=document.createElement('div');menu.id='happinessFloatingMenu';menu.className='happiness-menu';menu.setAttribute('role','listbox');menu.innerHTML=[0,25,50,75,100].map(v=>'<button type="button" class="happiness-option" role="option" data-happiness-value="'+v+'">'+v+'</button>').join('');document.body.appendChild(menu);return menu}
-function closeHappinessMenu(){const menu=document.getElementById('happinessFloatingMenu');if(menu)menu.classList.remove('open');document.querySelectorAll('.happiness-toggle[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'));happinessActiveInput=null}
-function openHappinessMenu(toggle){const combo=toggle.closest('.happiness-combo'),input=combo?.querySelector('.happiness-input');if(!input)return;const same=happinessActiveInput===input&&document.getElementById('happinessFloatingMenu')?.classList.contains('open');if(same){closeHappinessMenu();return}closeHappinessMenu();const menu=ensureHappinessMenu();happinessActiveInput=input;toggle.setAttribute('aria-expanded','true');menu.classList.add('open');const rect=combo.getBoundingClientRect(),menuHeight=menu.offsetHeight||170,below=window.innerHeight-rect.bottom,top=below>=menuHeight+6?rect.bottom+2:Math.max(4,rect.top-menuHeight-2),width=Math.max(rect.width,64),left=Math.min(Math.max(4,rect.left),Math.max(4,window.innerWidth-width-4));menu.style.left=left+'px';menu.style.top=top+'px';menu.style.width=width+'px'}
-document.addEventListener('click',e=>{const option=e.target.closest('.happiness-option');if(option&&happinessActiveInput){const input=happinessActiveInput;input.value=option.dataset.happinessValue;closeHappinessMenu();input.dispatchEvent(new Event('change',{bubbles:true}));input.focus();return}const toggle=e.target.closest('.happiness-toggle');if(toggle){openHappinessMenu(toggle);return}if(!e.target.closest('.happiness-combo')&&!e.target.closest('#happinessFloatingMenu'))closeHappinessMenu()})
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('happinessFloatingMenu')?.classList.contains('open')){closeHappinessMenu();return}if((e.key==='ArrowDown'||e.key==='Enter')&&e.target.classList?.contains('happiness-toggle')){e.preventDefault();openHappinessMenu(e.target)}})
-document.addEventListener('scroll',()=>closeHappinessMenu(),true);window.addEventListener('resize',closeHappinessMenu)
 
 function selfCheck(){
   const bad=[];
