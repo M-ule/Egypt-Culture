@@ -93,13 +93,14 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 #tResource,#tProduct{width:1100px!important;min-width:1100px!important}
 #tGoal,#tSleep{width:700px!important;min-width:700px!important}
 #tConvert{width:800px!important;min-width:800px!important}
-#tPower{width:500px!important;min-width:500px!important}
+#tPower{width:400px!important;min-width:400px!important}
 #tResource,#tProduct,#tGoal,#tSleep,#tPower,#tConvert{table-layout:fixed!important;border-spacing:0!important}
 #tResource th,#tResource td,#tProduct th,#tProduct td,#tGoal th,#tGoal td,#tSleep th,#tSleep td,#tPower th,#tPower td,#tConvert th,#tConvert td{
   box-sizing:border-box!important;width:100px!important;min-width:100px!important;max-width:100px!important;height:30px!important;min-height:30px!important;padding:4px 6px!important;line-height:20px!important;vertical-align:middle!important
 }
 #tResource th,#tProduct th,#tGoal th,#tSleep th,#tPower th,#tConvert th{white-space:nowrap}
 #tConvert tbody td:nth-child(n+3){font-weight:800!important}
+#tConvert tr.conversion-continuation td:first-child{position:static;left:auto;z-index:auto;border-left:0}
 /* modal */
 .detail-modal[hidden]{display:none}.detail-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}
 .detail-backdrop{position:absolute;inset:0;background:rgba(64,51,31,.48)}
@@ -150,7 +151,7 @@ body.detail-modal-open{overflow:hidden}
   #tProduct td:nth-child(8)::before{content:"예상 생산량"}#tProduct td:nth-child(9)::before{content:"화폐 사용량"}#tProduct td:nth-child(10)::before{content:"파피루스 사용량"}#tProduct td:nth-child(11)::before{content:"금 사용량"}
   #tGoal td:nth-child(2)::before{content:"잔여/부족"}#tGoal td:nth-child(3)::before{content:"구간 필요량"}#tGoal td:nth-child(4)::before{content:"현재 보유량"}#tGoal td:nth-child(5)::before{content:"예상 생산량"}#tGoal td:nth-child(6)::before{content:"예상 보유량"}#tGoal td:nth-child(7)::before{content:"소요 시간(h)"}
   #tSleep td:nth-child(2)::before{content:"생산력 차이"}#tSleep td:nth-child(3)::before{content:"현재 생산력"}#tSleep td:nth-child(4)::before{content:"필요 생산력"}#tSleep td:nth-child(5)::before{content:"필요량"}#tSleep td:nth-child(6)::before{content:"예상 확보량"}#tSleep td:nth-child(7)::before{content:"잔여/부족"}
-  #tPower td:nth-child(2)::before{content:"생산력 차이"}#tPower td:nth-child(3)::before{content:"현재 생산력"}#tPower td:nth-child(4)::before{content:"필요 생산력"}#tPower td:nth-child(5)::before{content:"잔여/부족"}
+  #tPower td:nth-child(2)::before{content:"생산력 차이"}#tPower td:nth-child(3)::before{content:"현재 생산력"}#tPower td:nth-child(4)::before{content:"필요 생산력"}
   #tResource input,#tResource select,#tProduct input,#tProduct select{font-size:16px;min-height:40px}
   #tConvert{min-width:800px!important}
 }
@@ -223,7 +224,7 @@ body.detail-modal-open{overflow:hidden}
 
   <div class="note">
     1. <b>불가사의</b>와 <b>보너스 적용 레벨</b>을 입력하면 선택한 불가사의의 생산 보너스가 자동 반영됩니다. <b>일괄 운영 시간</b>은 운영 시간을 따로 입력하지 않은 항목에 적용됩니다.<br>
-    2. <b>자원</b>은 현재 보유량·예상 생산량·상품 생산에 필요한 사용량을 반영하여 잔여/부족과 소요 시간을 계산합니다.<br>
+    2. <b>자원</b>은 현재 보유량·예상 생산량·상품 생산에 필요한 사용량을 반영하여 잔여/부족과 소요 시간을 계산합니다. <b>소요 시간(h)</b>은 현재 보유량을 포함하여 부족한 자원이 처음 ‘잔여’가 되기까지 필요한 운영 시간입니다.<br>
     3. <b>상품</b>의 설정을 기준으로 예상 생산량과 자원 사용량을 계산합니다.
   </div>
 </section>
@@ -248,7 +249,7 @@ body.detail-modal-open{overflow:hidden}
     <label for="sleepPrepH">수면까지 남은 시간(h)</label>
     <div class="step-wrap sleep-time-wrap"><input id="sleepPrepH" class="step-one" type="number" min="0" step="any" placeholder="일괄"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
     <label for="sleepCycle">수면 중 생산 주기</label>
-    <select id="sleepCycle"><option value="최장">레벨별 최장(자동)</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
+    <select id="sleepCycle"><option value="최장">레벨별 최장</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
     <label for="sleepCount">생산 횟수</label>
     <div class="step-wrap"><input id="sleepCount" class="step-one" type="number" min="0" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
   </div>
@@ -259,7 +260,7 @@ body.detail-modal-open{overflow:hidden}
   <div class="section-title-row"><h2>목표 레벨 생산력 비교</h2></div>
   <div class="power-layout">
     <div class="power-main"><div class="table-wrap"><table id="tPower"><thead><tr>
-      <th>생산 항목</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>잔여/부족</th>
+      <th>생산 항목</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th>
     </tr></thead><tbody></tbody></table></div></div>
     <div class="power-side"><div id="convertPanel" class="convert-panel" hidden><div class="table-wrap"><table id="tConvert"><thead><tr>
       <th>생산 항목</th><th>생산 방식</th><th>Lv1</th><th>Lv2</th><th>Lv3</th><th>Lv4</th><th>Lv5</th><th>Lv6</th>
@@ -493,7 +494,7 @@ function productRow(name){
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(productActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
   const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'일괄')+'</td>';
-  return '<tr data-group="products" data-name="'+name+'"><td class="name">'+name+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+modeCell+bldgCell+happyCell+hoursCell+
+  return '<tr data-group="products" data-name="'+name+'"><td class="name">'+name+'</td>'+levelCell+modeCell+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td><td class="num calc">'+fmtQty(out)+'</td>'+
     '<td class="num calc">'+fmtQty(productUse(name,'currency'))+'</td><td class="num calc">'+fmtQty(productUse(name,'파피루스'))+'</td><td class="num calc">'+fmtQty(productUse(name,'금'))+'</td></tr>'
 }
@@ -633,7 +634,7 @@ function requiredPowerIndex(a){return Number.isFinite(a.needed)?Math.max(0,a.nee
 function powerDifferenceIndex(a){return Number.isFinite(a.diff)?a.diff:null}
 function adjustmentRow(a){
   const c=currentPowerIndex(a),r=requiredPowerIndex(a),d=powerDifferenceIndex(a),shown=d===null?null:Math.round(d*10)/10,cls=shown===null?'':(shown<0?'remain-bad':'remain-ok'),rowCls=a.kind==='상품'&&a.name===productOrder[0]?' class="divider-top"':'';
-  return '<tr'+rowCls+'><td class="name">'+displayName(a.name)+'</td><td class="num calc '+cls+'">'+(d===null?'—':fmtSignedPower(d))+'</td><td class="num calc">'+(c===null?'—':fmtPower(c))+'</td><td class="num calc">'+(r===null?'—':fmtPower(r))+'</td><td class="num calc">'+(a.basisNeed===null?'—':fmtQty(a.basisNeed))+'</td></tr>'
+  return '<tr'+rowCls+'><td class="name">'+displayName(a.name)+'</td><td class="num calc '+cls+'">'+(d===null?'—':fmtSignedPower(d))+'</td><td class="num calc">'+(c===null?'—':fmtPower(c))+'</td><td class="num calc">'+(r===null?'—':fmtPower(r))+'</td></tr>'
 }
 function renderAdjustment(){
   const rows=[...resourceOrder.map(resourceAdjustment),...productOrder.map(productAdjustment)];
@@ -655,14 +656,19 @@ function resourceConversionRatio(name,lv){
   const base=resourceBenchmarkRate(name),rate=resourceConfigRate(name,lv,100);
   return base>0?rate/base:null
 }
-function conversionRow(kind,name,mode=null,rowCls=''){
+function conversionRow(kind,name,mode=null,rowCls='',nameRowspan=1,showName=true){
   const isProduct=kind==='상품',shownMode=isProduct?mode:'연속',ratios=[1,2,3,4,5,6].map(lv=>isProduct?productConversionRatio(name,lv,mode):resourceConversionRatio(name,lv));
-  return '<tr'+(rowCls?' class="'+rowCls+'"':'')+'><td class="name">'+displayName(name)+'</td><td class="calc">'+shownMode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
+  const classes=[rowCls,!showName?'conversion-continuation':''].filter(Boolean).join(' ');
+  const nameCell=showName?'<td class="name"'+(nameRowspan>1?' rowspan="'+nameRowspan+'"':'')+'>'+displayName(name)+'</td>':'';
+  return '<tr'+(classes?' class="'+classes+'"':'')+'>'+nameCell+'<td class="calc">'+shownMode+'</td>'+ratios.map(r=>'<td class="num calc">'+fmtPower(r===null?null:r*100)+'</td>').join('')+'</tr>'
 }
 function renderConversion(){
   const resourceRows=resourceOrder.map(n=>conversionRow('자원',n));
   const productRows=[];
-  productOrder.forEach((name,nameIndex)=>productConversionModes(name).forEach((mode,modeIndex)=>productRows.push(conversionRow('상품',name,mode,nameIndex===0&&modeIndex===0?'divider-top':''))));
+  productOrder.forEach((name,nameIndex)=>{
+    const modes=productConversionModes(name);
+    modes.forEach((mode,modeIndex)=>productRows.push(conversionRow('상품',name,mode,nameIndex===0&&modeIndex===0?'divider-top':'',modes.length,modeIndex===0)))
+  });
   document.querySelector('#tConvert tbody').innerHTML=[...resourceRows,...productRows].join('')
 }
 
