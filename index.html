@@ -174,7 +174,7 @@ body.detail-modal-open{overflow:hidden}
     <select id="wonderName"><option>아부심벨</option><option>쿠푸왕의 피라미드</option><option>대스핑크스</option><option>호루스의 신전</option></select>
     <label for="bonusLv">보너스 적용 레벨</label>
     <div class="step-wrap"><input id="bonusLv" class="step-one" type="number" min="0" max="50" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
-    <label for="baseH">일괄 운영 시간(h)</label>
+    <label for="baseH">기본 운영 시간(h)</label>
     <div class="step-wrap"><input id="baseH" class="step-one" type="number" min="0" step="any"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
     <button id="saveDefaultBtn" class="save-default-btn" type="button">입력값 저장</button>
     <button id="resetBtn" class="reset-btn" type="button">초기화</button><span id="resetStatus" class="reset-status"></span>
@@ -223,7 +223,7 @@ body.detail-modal-open{overflow:hidden}
   </div>
 
   <div class="note">
-    1. <b>불가사의</b>와 <b>보너스 적용 레벨</b>을 입력하면 선택한 불가사의의 생산 보너스가 자동 반영됩니다. <b>일괄 운영 시간</b>은 운영 시간을 따로 입력하지 않은 항목에 적용됩니다.<br>
+    1. <b>불가사의</b>와 <b>보너스 적용 레벨</b>을 입력하면 선택한 불가사의의 생산 보너스가 자동 반영됩니다. <b>기본 운영 시간</b>은 개별 운영 시간이 비어 있는 항목에 적용되며, 상세 설정은 각 행의 운영 시간을 우선하고 비어 있으면 개별 운영 시간 → 기본 운영 시간 순으로 적용됩니다.<br>
     2. <b>자원</b>은 현재 보유량·예상 생산량·상품 생산에 필요한 사용량을 반영하여 잔여/부족과 소요 시간을 계산합니다. <b>소요 시간(h)</b>은 현재 보유량을 포함하여 부족한 자원이 처음 ‘잔여’가 되기까지 필요한 운영 시간입니다.<br>
     3. <b>상품</b>의 설정을 기준으로 예상 생산량과 자원 사용량을 계산합니다.
   </div>
@@ -235,7 +235,7 @@ body.detail-modal-open{overflow:hidden}
     <div class="step-wrap"><input id="curLv" class="step-one" type="number" min="0" max="50" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
     <label for="tgtLv">목표 레벨</label>
     <div class="step-wrap"><input id="tgtLv" class="step-one" type="number" min="0" max="50" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
-    <label>일괄 운영 시간</label><span id="wonderBaseHDisplay" class="setting-value">0 h</span>
+    <label>기본 운영 시간</label><span id="wonderBaseHDisplay" class="setting-value">0 h</span>
     <button id="convertToggle" class="convert-toggle" type="button" aria-expanded="false">생산력 환산표 보기</button>
   </div>
 
@@ -247,7 +247,7 @@ body.detail-modal-open{overflow:hidden}
   <div class="section-title-row"><h2>수면 대비 자원 확보</h2></div>
   <div class="settings sleep-settings">
     <label for="sleepPrepH">수면까지 남은 시간(h)</label>
-    <div class="step-wrap sleep-time-wrap"><input id="sleepPrepH" class="step-one" type="number" min="0" step="any" placeholder="일괄"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
+    <div class="step-wrap sleep-time-wrap"><input id="sleepPrepH" class="step-one" type="number" min="0" step="any" placeholder="기본"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
     <label for="sleepCycle">수면 중 생산 주기</label>
     <select id="sleepCycle"><option value="최장">레벨별 최장</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
     <label for="sleepCount">생산 횟수</label>
@@ -362,7 +362,7 @@ function happinessRatio(v){return clamp(num(v,100),0,100)/100}
 function normalizedHappiness(v,fallback=100){const n=Number(v);return Number.isFinite(n)?clamp(n,0,100):fallback}
 function effectiveHours(group,name){const h=app[group][name].hours;return h===''||h===null||!Number.isFinite(parseFloat(h))?Math.max(0,num(app.settings.baseH,0)):Math.max(0,num(h,0))}
 function normalizedDetailHours(v){return v===''||v===null||v===undefined||!Number.isFinite(parseFloat(v))?'':Math.max(0,num(v,0))}
-function detailHours(row){const h=normalizedDetailHours(row?.hours);return h===''?Math.max(0,num(app.settings.baseH,0)):h}
+function detailHours(group,name,row){const h=normalizedDetailHours(row?.hours);return h===''?effectiveHours(group,name):h}
 
 function bonusInfo(){return BONUS[app.settings.wonder]?.[String(app.settings.wLv)]||{bonus:0,target:null}}
 function workerInfo(){return WORKERS[app.settings.wonder]?.[String(app.settings.wLv)]||{workers:0,next:null}}
@@ -397,12 +397,12 @@ function productDetailLevelText(name){if(!detailEnabled(name))return String(app.
 
 function resourceOutputForHours(name,h){
   h=Math.max(0,num(h,0));const mult=resourceWonderMultiplier(name);
-  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>{const p=infoResource(name,row.lv),rowH=normalizedDetailHours(row.hours),useH=rowH===''?effectiveHours('resources',name):rowH;return sum+continuousOutput(p,useH,Math.max(0,num(row.count,0)),row.irrigation,mult)},0);
-  const s=app.resources[name],useH=s.hours===''||s.hours===null||!Number.isFinite(parseFloat(s.hours))?h:Math.max(0,num(s.hours,0));return continuousOutput(infoResource(name,s.lv),useH,s.bldgs,s.irrigation,mult)
+  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>{const p=infoResource(name,row.lv);return sum+continuousOutput(p,h,Math.max(0,num(row.count,0)),row.irrigation,mult)},0);
+  const s=app.resources[name];return continuousOutput(infoResource(name,s.lv),h,s.bldgs,s.irrigation,mult)
 }
 function resourceOutput(name){
   const mult=resourceWonderMultiplier(name);
-  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>sum+continuousOutput(infoResource(name,row.lv),detailHours(row),Math.max(0,num(row.count,0)),row.irrigation,mult),0);
+  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>sum+continuousOutput(infoResource(name,row.lv),detailHours('resources',name,row),Math.max(0,num(row.count,0)),row.irrigation,mult),0);
   return resourceOutputForHours(name,effectiveHours('resources',name))
 }
 function productOutputForHours(name,h){
@@ -411,16 +411,16 @@ function productOutputForHours(name,h){
   const s=app.products[name];return cyclicOutput(infoProduct(name,s.lv,s.mode),h,s.bldgs,s.irrigation)
 }
 function productOutput(name){
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicOutput(infoProduct(name,row.lv,row.mode),detailHours(row),Math.max(0,num(row.count,0)),row.irrigation),0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicOutput(infoProduct(name,row.lv,row.mode),detailHours('products',name,row),Math.max(0,num(row.count,0)),row.irrigation),0);
   return productOutputForHours(name,effectiveHours('products',name))
 }
 function productUseForHours(name,kind,h){
   h=Math.max(0,num(h,0));
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>{const rowH=normalizedDetailHours(row.hours),useH=rowH===''?effectiveHours('products',name):rowH;return sum+cyclicUse(infoProduct(name,row.lv,row.mode),useH,Math.max(0,num(row.count,0)),kind)},0);
-  const s=app.products[name],useH=s.hours===''||s.hours===null||!Number.isFinite(parseFloat(s.hours))?h:Math.max(0,num(s.hours,0));return cyclicUse(infoProduct(name,s.lv,s.mode),useH,s.bldgs,kind)
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),h,Math.max(0,num(row.count,0)),kind),0);
+  const s=app.products[name];return cyclicUse(infoProduct(name,s.lv,s.mode),h,s.bldgs,kind)
 }
 function productUse(name,kind){
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),detailHours(row),Math.max(0,num(row.count,0)),kind),0);
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),detailHours('products',name,row),Math.max(0,num(row.count,0)),kind),0);
   return productUseForHours(name,kind,effectiveHours('products',name))
 }
 function rawConsumption(raw){return productOrder.reduce((sum,n)=>sum+productUse(n,raw),0)}
@@ -454,7 +454,7 @@ function stepper(k,value,placeholder=''){const val=value===''?'':value;return '<
 function levelStepper(value,min=1,max=6){return '<div class="step-wrap"><input type="number" class="step-one" data-k="lv" value="'+value+'" step="1" min="'+min+'" max="'+max+'"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 function happinessInput(k,value,attr='data-k'){const v=normalizedHappiness(value,100);return '<div class="happiness-combo"><input type="text" class="happiness-input" inputmode="decimal" autocomplete="off" '+attr+'="'+k+'" value="'+v+'" aria-label="행복도 퍼센트"></div>'}
 function detailCountStepper(attr,value){return '<div class="step-wrap"><input type="number" class="step-one" min="0" step="1" '+attr+'="count" value="'+value+'"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
-function detailHoursStepper(attr,value){const v=normalizedDetailHours(value);return '<div class="step-wrap"><input type="number" class="step-one" min="0" step="any" '+attr+'="hours" value="'+v+'" placeholder="일괄"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
+function detailHoursStepper(attr,value){const v=normalizedDetailHours(value);return '<div class="step-wrap"><input type="number" class="step-one" min="0" step="any" '+attr+'="hours" value="'+v+'" placeholder="기본"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>'}
 
 function renderBonus(){
   const b=bonusInfo(),w=workerInfo(),bonus=[];
@@ -555,7 +555,7 @@ function resourceLv6PerBuildingOutputForHours(name,h){return resourceBenchmarkRa
 function resourceCurrentLv6Equivalent(name){const p=resourceCurrentPower(name);return Number.isFinite(p)?p/100:0}
 
 function sleepResourcePower(name){
-  const h=sleepPrepHours(),prepProd=resourceOutputForHours(name,h),prepUse=productOrder.reduce((s,n)=>s+productUseForHours(n,name,h),0),sleepNeed=sleepRawRequirement(name),stock=num(app.resources[name].stock,0),projected=stock+prepProd-prepUse,remain=projected-sleepNeed,requiredProduction=Math.max(0,prepUse+sleepNeed-stock);
+  const h=sleepPrepHours(),prepProd=resourceOutput(name),prepUse=productOrder.reduce((s,n)=>s+productUse(n,name),0),sleepNeed=sleepRawRequirement(name),stock=num(app.resources[name].stock,0),projected=stock+prepProd-prepUse,remain=projected-sleepNeed,requiredProduction=Math.max(0,prepUse+sleepNeed-stock);
   const ref=resourceLv6PerBuildingOutputForHours(name,h),current=Number.isFinite(resourceCurrentPower(name))?resourceCurrentPower(name):0;
   if(requiredProduction<=1e-10)return {current,needed:0,diff:current,sleepNeed,projected,remain};
   if(!(ref>0))return {current,needed:null,diff:null,sleepNeed,projected,remain};
