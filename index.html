@@ -397,8 +397,8 @@ function productDetailLevelText(name){if(!detailEnabled(name))return String(app.
 
 function resourceOutputForHours(name,h){
   h=Math.max(0,num(h,0));const mult=resourceWonderMultiplier(name);
-  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>{const p=infoResource(name,row.lv);return sum+continuousOutput(p,h,Math.max(0,num(row.count,0)),row.irrigation,mult)},0);
-  const s=app.resources[name];return continuousOutput(infoResource(name,s.lv),h,s.bldgs,s.irrigation,mult)
+  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>{const p=infoResource(name,row.lv),rowH=normalizedDetailHours(row.hours),useH=rowH===''?effectiveHours('resources',name):rowH;return sum+continuousOutput(p,useH,Math.max(0,num(row.count,0)),row.irrigation,mult)},0);
+  const s=app.resources[name],useH=s.hours===''||s.hours===null||!Number.isFinite(parseFloat(s.hours))?h:Math.max(0,num(s.hours,0));return continuousOutput(infoResource(name,s.lv),useH,s.bldgs,s.irrigation,mult)
 }
 function resourceOutput(name){
   const mult=resourceWonderMultiplier(name);
@@ -416,8 +416,8 @@ function productOutput(name){
 }
 function productUseForHours(name,kind,h){
   h=Math.max(0,num(h,0));
-  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),h,Math.max(0,num(row.count,0)),kind),0);
-  const s=app.products[name];return cyclicUse(infoProduct(name,s.lv,s.mode),h,s.bldgs,kind)
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>{const rowH=normalizedDetailHours(row.hours),useH=rowH===''?effectiveHours('products',name):rowH;return sum+cyclicUse(infoProduct(name,row.lv,row.mode),useH,Math.max(0,num(row.count,0)),kind)},0);
+  const s=app.products[name],useH=s.hours===''||s.hours===null||!Number.isFinite(parseFloat(s.hours))?h:Math.max(0,num(s.hours,0));return cyclicUse(infoProduct(name,s.lv,s.mode),useH,s.bldgs,kind)
 }
 function productUse(name,kind){
   if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>sum+cyclicUse(infoProduct(name,row.lv,row.mode),detailHours(row),Math.max(0,num(row.count,0)),kind),0);
