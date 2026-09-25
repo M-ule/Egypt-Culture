@@ -478,7 +478,7 @@ function resourceRow(name){
   const levelCell=detail?'<td class="calc detail-active-cell">'+resourceDetailLevelText(name)+'</td>':'<td class="input-cell">'+levelStepper(s.lv)+'</td>';
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(resourceActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
-  const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'일괄')+'</td>';
+  const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'기본')+'</td>';
   return '<tr data-group="resources" data-name="'+name+'"><td class="name">'+displayName(name)+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+
     '<td class="fixed-input">연속</td>'+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td>'+
@@ -493,7 +493,7 @@ function productRow(name){
   const modeCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell"><select data-k="mode">'+modeHtml+'</select></td>';
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(productActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
-  const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'일괄')+'</td>';
+  const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'기본')+'</td>';
   return '<tr data-group="products" data-name="'+name+'"><td class="name">'+name+'</td>'+levelCell+modeCell+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td><td class="num calc">'+fmtQty(out)+'</td>'+
     '<td class="num calc">'+fmtQty(productUse(name,'currency'))+'</td><td class="num calc">'+fmtQty(productUse(name,'파피루스'))+'</td><td class="num calc">'+fmtQty(productUse(name,'금'))+'</td></tr>'
@@ -742,6 +742,7 @@ document.getElementById('resourceDetailModal').addEventListener('click',e=>{if(e
 document.getElementById('resourceDetailEnabled').addEventListener('change',e=>{const d=app.resourceDetails[detailResource];d.enabled=!!e.target.checked;if(d.enabled)seedResourceDetailFromLegacy(detailResource);normalizeResourceDetail(detailResource);renderAll();renderResourceDetailModal();saveState()})
 document.getElementById('resourceDetailAdd').addEventListener('click',()=>{const d=app.resourceDetails[detailResource];if(!d.enabled)return;const s=app.resources[detailResource];d.rows.push({lv:s.lv,count:1,irrigation:normalizedHappiness(s.irrigation,100),hours:''});normalizeResourceDetail(detailResource);renderAll();renderResourceDetailModal();saveState()})
 document.getElementById('resourceDetailRows').addEventListener('change',e=>{const el=e.target.closest('[data-resource-detail-k]');if(!el)return;const rowEl=el.closest('[data-resource-detail-index]');if(!rowEl)return;const idx=parseInt(rowEl.dataset.resourceDetailIndex),row=app.resourceDetails[detailResource].rows[idx];if(!row)return;const k=el.dataset.resourceDetailK;if(k==='lv')row.lv=clamp(parseInt(el.value)||1,1,6);if(k==='count')row.count=Math.max(0,num(el.value,0));if(k==='irrigation')row.irrigation=normalizedHappiness(el.value,100);if(k==='hours')row.hours=normalizedDetailHours(el.value);normalizeResourceDetail(detailResource);renderAll();renderResourceDetailResult(detailResource);saveState()})
+document.getElementById('resourceDetailRows').addEventListener('input',e=>{const el=e.target.closest('[data-resource-detail-k="hours"]');if(!el)return;const rowEl=el.closest('[data-resource-detail-index]');if(!rowEl)return;const idx=parseInt(rowEl.dataset.resourceDetailIndex),row=app.resourceDetails[detailResource].rows[idx];if(!row)return;row.hours=normalizedDetailHours(el.value);normalizeResourceDetail(detailResource);renderAll();renderResourceDetailResult(detailResource);saveState()})
 
 document.getElementById('productDetailOpen').addEventListener('click',()=>openDetailModal())
 document.getElementById('productDetailModal').addEventListener('click',e=>{if(e.target.closest('[data-detail-close]')){closeDetailModal();return}const tab=e.target.closest('[data-detail-product]');if(tab){detailProduct=tab.dataset.detailProduct;renderDetailModal();return}const remove=e.target.closest('[data-detail-remove]');if(remove){const idx=parseInt(remove.dataset.detailRemove);if(Number.isInteger(idx))app.details[detailProduct].rows.splice(idx,1);if(app.details[detailProduct].enabled&&!app.details[detailProduct].rows.length)app.details[detailProduct].enabled=false;normalizeDetailProduct(detailProduct);renderAll();renderDetailModal();saveState()}})
