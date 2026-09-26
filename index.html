@@ -269,7 +269,7 @@ body.detail-modal-open{overflow:hidden}
 
   <div class="note">
     1. <b>목표 달성 현황</b>은 <b>현재 레벨</b>과 <b>목표 레벨</b>을 기준으로 필요한 상품량과 목표 달성 여부를 계산합니다. <b>소요 시간(h)</b>은 현재 보유량을 포함하여 부족한 상품이 처음 ‘잔여’가 되기까지 필요한 운영 시간입니다.<br>
-    2. <b>수면 대비 자원 확보</b>는 수면까지 남은 시간과 수면 중 생산 주기·횟수를 기준으로, 현재 설정된 상품 생산에 필요한 파피루스·금과 현재 보유량을 반영하여 필요한 생산력을 계산합니다.<br>
+    2. <b>수면 대비 자원 확보</b>는 수면까지 남은 시간과 수면 중 생산 주기·횟수를 기준으로, 현재 설정된 상품 생산에 필요한 파피루스·금과 현재 보유량을 반영하여 필요한 생산력을 계산합니다. <b>현재 생산력</b>은 자원별 개별 운영 시간을 반영하며, 상세 설정을 사용하면 각 행의 운영 시간을 각각 반영합니다.<br>
     3. <b>목표 레벨 생산력 비교</b>는 <b>현재 생산력</b>과 <b>목표 레벨 달성에 필요한 생산력</b>을 비교하여 <b>생산력 차이</b>를 계산합니다. 상품 부족분과 그 생산에 필요한 자원까지 반영합니다.<br>
     ※ <span class="happy-highlight"><b>생산력</b></span>은 각 생산 항목의 <span class="happy-highlight"><b>Lv6·행복도 100%·30분 생산을 100</b></span>으로 환산한 지수입니다. <b>현재 생산력</b>은 현재 설정된 건물 구성의 생산 능력이며, <b>필요 생산력</b>은 현재 보유량을 고려해 목표 달성에 필요한 생산 능력입니다.
   </div>
@@ -554,9 +554,33 @@ function resourceCurrentPower(name){
 function resourceLv6PerBuildingOutputForHours(name,h){return resourceBenchmarkRate(name)*Math.max(0,num(h,0))}
 function resourceCurrentLv6Equivalent(name){const p=resourceCurrentPower(name);return Number.isFinite(p)?p/100:0}
 
+function sleepPrepResourceOutput(name){
+  const h=sleepPrepHours(),mult=resourceWonderMultiplier(name);
+  if(!(h>0))return 0;
+  if(resourceDetailEnabled(name))return app.resourceDetails[name].rows.reduce((sum,row)=>{
+    const rowH=Math.min(h,detailHours('resources',name,row));
+    return sum+continuousOutput(infoResource(name,row.lv),rowH,Math.max(0,num(row.count,0)),row.irrigation,mult)
+  },0);
+  const s=app.resources[name],rowH=Math.min(h,effectiveHours('resources',name));
+  return continuousOutput(infoResource(name,s.lv),rowH,s.bldgs,s.irrigation,mult)
+}
+function sleepPrepProductUse(name,kind){
+  const h=sleepPrepHours();if(!(h>0))return 0;
+  if(detailEnabled(name))return app.details[name].rows.reduce((sum,row)=>{
+    const rowH=Math.min(h,detailHours('products',name,row));
+    return sum+cyclicUse(infoProduct(name,row.lv,row.mode),rowH,Math.max(0,num(row.count,0)),kind)
+  },0);
+  return productUseForHours(name,kind,Math.min(h,effectiveHours('products',name)))
+}
+function sleepResourceCurrentPower(name){
+  const h=sleepPrepHours(),ref=resourceBenchmarkRate(name);
+  if(!(ref>0))return null;
+  if(!(h>0))return 0;
+  return sleepPrepResourceOutput(name)/(ref*h)*100
+}
 function sleepResourcePower(name){
-  const h=sleepPrepHours(),prepProd=resourceOutput(name),prepUse=productOrder.reduce((s,n)=>s+productUse(n,name),0),sleepNeed=sleepRawRequirement(name),stock=num(app.resources[name].stock,0),projected=stock+prepProd-prepUse,remain=projected-sleepNeed,requiredProduction=Math.max(0,prepUse+sleepNeed-stock);
-  const ref=resourceLv6PerBuildingOutputForHours(name,h),current=Number.isFinite(resourceCurrentPower(name))?resourceCurrentPower(name):0;
+  const h=sleepPrepHours(),prepProd=sleepPrepResourceOutput(name),prepUse=productOrder.reduce((s,n)=>s+sleepPrepProductUse(n,name),0),sleepNeed=sleepRawRequirement(name),stock=num(app.resources[name].stock,0),projected=stock+prepProd-prepUse,remain=projected-sleepNeed,requiredProduction=Math.max(0,prepUse+sleepNeed-stock);
+  const ref=resourceLv6PerBuildingOutputForHours(name,h),current=Number.isFinite(sleepResourceCurrentPower(name))?sleepResourceCurrentPower(name):0;
   if(requiredProduction<=1e-10)return {current,needed:0,diff:current,sleepNeed,projected,remain};
   if(!(ref>0))return {current,needed:null,diff:null,sleepNeed,projected,remain};
   const needed=requiredProduction/ref*100;return {current,needed,diff:current-needed,sleepNeed,projected,remain}
