@@ -87,6 +87,7 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 .detail-open-btn:hover,.convert-toggle:hover{background:#f0e2c6}.detail-summary{font-size:11px;color:var(--muted)}
 .detail-badge{display:inline-block;margin-left:4px;padding:1px 4px;border-radius:4px;background:#e2e5c3;color:#4a3f2c;font-size:9px;font-weight:900;vertical-align:1px}
 .detail-active-cell{background:#f1f2df!important;color:#4a3f2c!important;font-weight:800}
+.power-settings{width:400px;max-width:100%;min-height:44px;margin:0 0 8px}.power-settings select{min-width:90px}
 .power-layout{display:flex;align-items:flex-start;gap:8px;margin-top:8px}.power-main{flex:0 0 auto}.power-side{flex:0 0 auto}.convert-panel[hidden]{display:none}
 .divider-top td{border-top:3px solid var(--primary-2)}
 /* 고정 표 규격 */
@@ -258,6 +259,10 @@ body.detail-modal-open{overflow:hidden}
   </tr></thead><tbody></tbody></table></div>
 
   <div class="section-title-row"><h2>목표 레벨 생산력 비교</h2></div>
+  <div class="settings power-settings">
+    <label for="productRawCycle">상품 생산 자원 소비 주기</label>
+    <select id="productRawCycle"><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
+  </div>
   <div class="power-layout">
     <div class="power-main"><div class="table-wrap"><table id="tPower"><thead><tr>
       <th>생산 항목</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th>
@@ -271,7 +276,8 @@ body.detail-modal-open{overflow:hidden}
     1. <b>목표 달성 현황</b>은 <b>현재 레벨</b>과 <b>목표 레벨</b>을 기준으로 필요한 상품량과 목표 달성 여부를 계산합니다. <b>소요 시간(h)</b>은 현재 보유량을 포함하여 부족한 상품이 처음 ‘잔여’가 되기까지 필요한 운영 시간입니다.<br>
     2. <b>수면 대비 자원 확보</b>는 <b>수면까지 남은 시간</b>과 <b>수면 중 생산 주기·횟수</b>를 기준으로, 상품 생산에 필요한 자원과 보유량을 반영해 필요한 생산력을 계산합니다. <b>현재 생산력</b>은 자원별 운영 시간을 반영합니다.<br>
     3. <b>목표 레벨 생산력 비교</b>는 <b>현재 생산력</b>과 <b>목표 레벨 달성에 필요한 생산력</b>을 비교하여 <b>생산력 차이</b>를 계산합니다. 상품 부족분과 그 생산에 필요한 자원까지 반영합니다.<br>
-    ※ <span class="happy-highlight"><b>생산력</b></span>은 각 생산 항목의 <span class="happy-highlight"><b>Lv6·행복도 100%·30분 생산을 100</b></span>으로 환산한 지수입니다. <b>현재 생산력</b>은 현재 설정된 건물 구성의 생산 능력이며, <b>필요 생산력</b>은 현재 보유량을 고려해 목표 달성에 필요한 생산 능력입니다.
+    ※ <span class="happy-highlight"><b>생산력</b></span>은 각 생산 항목의 <span class="happy-highlight"><b>Lv6·행복도 100%·30분 생산을 100</b></span>으로 환산한 지수입니다. <b>현재 생산력</b>은 현재 설정된 건물 구성의 생산 능력이며, <b>필요 생산력</b>은 현재 보유량을 고려해 목표 달성에 필요한 생산 능력입니다.<br>
+    ※ <b>상품 생산 자원 소비 주기</b>는 필요 생산력 계산 시 상품 생산에 필요한 자원 소비량의 기준이 됩니다.
   </div>
 </section>
 
@@ -306,7 +312,7 @@ const HORUS_PAPYRUS_BASE={1:4200,2:6300,3:9500,4:15000,5:22000,6:32000};
 const wonderNames=['아부심벨','쿠푸왕의 피라미드','대스핑크스','호루스의 신전'];
 
 const DEFAULTS={
-  settings:{wonder:'아부심벨',wLv:0,baseH:0,sleepPrepH:'',sleepCycle:'최장',sleepCount:3},
+  settings:{wonder:'아부심벨',wLv:0,baseH:0,sleepPrepH:'',sleepCycle:'최장',sleepCount:3,productRawCycle:'30분'},
   resources:{
     '파피루스':{lv:1,bldgs:0,irrigation:100,hours:'',stock:0},
     '금':{lv:1,bldgs:0,irrigation:100,hours:'',stock:0}
@@ -618,7 +624,8 @@ function requiredPowerFromAmount(amount,hours,benchmarkRate){
 }
 function productRequiredPower(name){return requiredPowerFromAmount(productTargetNeed(name),effectiveHours('products',name),productBenchmarkRate(name))}
 function productBenchmarkRawRatio(name,raw){
-  const p=infoProduct(name,6,'30분');if(!p)return null;
+  const mode=['30분','1시간','2시간'].includes(app.settings.productRawCycle)?app.settings.productRawCycle:'30분';
+  const p=infoProduct(name,6,mode);if(!p)return null;
   if(p.raw!==raw)return 0;
   const out=happyCycleOutput(p,100);if(!(out>0))return null;
   return p.rawUse/out
@@ -726,13 +733,13 @@ function normalizeLoaded(obj){
     if(obj.details)for(const n of productOrder)Object.assign(d.details[n],obj.details[n]||{});
     if(obj.resourceDetails)for(const n of resourceOrder)Object.assign(d.resourceDetails[n],obj.resourceDetails[n]||{})
   }
-  if(!wonderNames.includes(d.settings.wonder))d.settings.wonder='아부심벨';d.settings.wLv=clamp(parseInt(d.settings.wLv)||0,0,50);d.settings.baseH=Math.max(0,num(d.settings.baseH,0));d.settings.sleepPrepH=d.settings.sleepPrepH===''||d.settings.sleepPrepH===null||d.settings.sleepPrepH===undefined?'':Math.max(0,num(d.settings.sleepPrepH,0));if(!['최장','30분','1시간','2시간'].includes(d.settings.sleepCycle))d.settings.sleepCycle='최장';d.settings.sleepCount=Math.max(0,Math.floor(num(d.settings.sleepCount,3)));
+  if(!wonderNames.includes(d.settings.wonder))d.settings.wonder='아부심벨';d.settings.wLv=clamp(parseInt(d.settings.wLv)||0,0,50);d.settings.baseH=Math.max(0,num(d.settings.baseH,0));d.settings.sleepPrepH=d.settings.sleepPrepH===''||d.settings.sleepPrepH===null||d.settings.sleepPrepH===undefined?'':Math.max(0,num(d.settings.sleepPrepH,0));if(!['최장','30분','1시간','2시간'].includes(d.settings.sleepCycle))d.settings.sleepCycle='최장';d.settings.sleepCount=Math.max(0,Math.floor(num(d.settings.sleepCount,3)));if(!['30분','1시간','2시간'].includes(d.settings.productRawCycle))d.settings.productRawCycle='30분';
   d.wonder.cur=clamp(parseInt(d.wonder.cur)||0,0,50);d.wonder.tgt=Math.max(d.wonder.cur,clamp(parseInt(d.wonder.tgt)||0,0,50));
   for(const n of resourceOrder){const s=d.resources[n];s.lv=clamp(parseInt(s.lv)||1,1,6);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
   for(const n of productOrder){const s=d.products[n];s.lv=closestProductLevel(n,s.lv);s.mode=closestModeForLevel(n,s.lv,s.mode);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
   return d
 }
-function syncSettingsInputs(){document.getElementById('wonderName').value=app.settings.wonder;document.getElementById('bonusLv').value=app.settings.wLv;document.getElementById('baseH').value=app.settings.baseH;document.getElementById('sleepPrepH').value=app.settings.sleepPrepH;document.getElementById('sleepCycle').value=app.settings.sleepCycle;document.getElementById('sleepCount').value=app.settings.sleepCount;document.getElementById('curLv').value=app.wonder.cur;document.getElementById('tgtLv').value=app.wonder.tgt}
+function syncSettingsInputs(){document.getElementById('wonderName').value=app.settings.wonder;document.getElementById('bonusLv').value=app.settings.wLv;document.getElementById('baseH').value=app.settings.baseH;document.getElementById('sleepPrepH').value=app.settings.sleepPrepH;document.getElementById('sleepCycle').value=app.settings.sleepCycle;document.getElementById('sleepCount').value=app.settings.sleepCount;document.getElementById('productRawCycle').value=app.settings.productRawCycle;document.getElementById('curLv').value=app.wonder.cur;document.getElementById('tgtLv').value=app.wonder.tgt}
 function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(app))}catch(e){}}
 function showResetStatus(message){const status=document.getElementById('resetStatus');status.textContent=message;if(resetStatusTimer)clearTimeout(resetStatusTimer);resetStatusTimer=setTimeout(()=>status.textContent='',1800)}
 function hasSavedDefault(){try{return !!localStorage.getItem(DEFAULT_STORAGE_KEY)}catch(e){return false}}
@@ -755,6 +762,7 @@ document.getElementById('baseH').addEventListener('change',e=>{app.settings.base
 document.getElementById('sleepPrepH').addEventListener('change',e=>{const v=e.target.value.trim();app.settings.sleepPrepH=v===''?'':Math.max(0,num(v,0));e.target.value=app.settings.sleepPrepH;renderSleepReserve();saveState();postSize()})
 document.getElementById('sleepCycle').addEventListener('change',e=>{app.settings.sleepCycle=e.target.value;renderSleepReserve();saveState();postSize()})
 document.getElementById('sleepCount').addEventListener('change',e=>{app.settings.sleepCount=Math.max(0,Math.floor(num(e.target.value,3)));e.target.value=app.settings.sleepCount;renderSleepReserve();saveState();postSize()})
+document.getElementById('productRawCycle').addEventListener('change',e=>{app.settings.productRawCycle=['30분','1시간','2시간'].includes(e.target.value)?e.target.value:'30분';e.target.value=app.settings.productRawCycle;renderAdjustment();saveState();postSize()})
 document.getElementById('curLv').addEventListener('change',e=>{app.wonder.cur=clamp(parseInt(e.target.value)||0,0,50);if(app.wonder.tgt<app.wonder.cur)app.wonder.tgt=app.wonder.cur;e.target.value=app.wonder.cur;document.getElementById('tgtLv').value=app.wonder.tgt;renderWonder();renderAdjustment();saveState()})
 document.getElementById('tgtLv').addEventListener('change',e=>{app.wonder.tgt=Math.max(app.wonder.cur,clamp(parseInt(e.target.value)||0,0,50));e.target.value=app.wonder.tgt;renderWonder();renderAdjustment();saveState()})
 document.getElementById('saveDefaultBtn').addEventListener('click',saveUserDefault)
