@@ -85,6 +85,7 @@ input[type=number]{text-align:center}select{cursor:pointer;text-align:center;tex
 .detail-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .detail-open-btn{padding:7px 11px;background:var(--soft-2);color:#4a3f2c;border:1px solid var(--border);border-radius:6px;cursor:pointer;font:800 12px var(--font);min-height:36px;white-space:nowrap}.convert-toggle{padding:7px 11px;background:var(--soft-2);color:#4a3f2c;border:1px solid var(--border);border-radius:6px;cursor:pointer;font:700 12px var(--font);min-height:36px;white-space:nowrap}
 .detail-open-btn:hover,.convert-toggle:hover{background:#f0e2c6}.detail-summary{font-size:11px;color:var(--muted)}
+.wonder-context{display:inline-flex;align-items:center;min-height:36px;padding:0 2px;font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
 .detail-badge{display:inline-block;margin-left:4px;padding:1px 4px;border-radius:4px;background:#e2e5c3;color:#4a3f2c;font-size:9px;font-weight:900;vertical-align:1px}
 .detail-active-cell{background:#f1f2df!important;color:#4a3f2c!important;font-weight:800}
 .power-settings{width:400px;max-width:100%;min-height:44px;margin:0 0 8px}.power-settings select{min-width:90px}
@@ -128,7 +129,7 @@ body.detail-modal-open{overflow:hidden}
 @media(max-width:720px){
   body{padding:10px}h1{font-size:20px}.settings{gap:8px}.settings .spacer{display:none}.section-title-row{align-items:flex-start}.detail-actions{width:100%}
   .detail-open-btn,.convert-toggle{min-height:44px;font-size:12px}.sleep-settings{max-width:100%;padding:9px 10px;min-height:0}.sleep-settings label{flex:1 1 auto}.sleep-settings .sleep-time-wrap{width:104px}.sleep-settings .sleep-time-wrap input{width:78px;font-size:16px;min-height:44px}.sleep-settings .sleep-time-wrap .step-controls{width:26px;flex-basis:26px}.sleep-settings .sleep-time-wrap .step-btn{min-height:22px;font-size:10px}
-  .wonder-settings{height:auto!important;min-height:0!important;flex-wrap:wrap}.wonder-settings .convert-toggle{height:auto;min-height:44px;padding:7px 11px}#panel-prod>.settings{height:auto;min-height:0}
+  .wonder-settings{height:auto!important;min-height:0!important;flex-wrap:wrap}.wonder-settings .convert-toggle{height:auto;min-height:44px;padding:7px 11px}.wonder-context{grid-column:1/-1;min-height:0;padding:2px 0 0;font-size:11px;white-space:normal}#panel-prod>.settings{height:auto;min-height:0}
   .note{width:100%;max-width:100%;white-space:normal}.detail-modal{align-items:flex-end;padding:0}.detail-sheet{width:100%;max-height:90vh;border-radius:14px 14px 0 0;padding:12px 10px 14px}.detail-tabs{grid-template-columns:repeat(2,1fr)}.detail-tab{min-height:44px;font-size:13px}.detail-toolbar{grid-template-columns:1fr}.detail-row{grid-template-columns:1fr 1fr}.detail-row .detail-field input,.detail-row .detail-field select{min-height:44px;font-size:16px}
   .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-bottom:0}.tab,.tab.active,.tab:not(.active){margin:0;border:1px solid var(--border);border-radius:8px;min-height:44px}
   #panel-prod>.settings,.wonder-settings,.sleep-settings{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);width:100%!important;height:auto!important;min-height:0!important;gap:7px 9px;align-items:center}
@@ -238,6 +239,7 @@ body.detail-modal-open{overflow:hidden}
     <div class="step-wrap"><input id="tgtLv" class="step-one" type="number" min="0" max="50" step="1"><div class="step-controls"><button type="button" class="step-btn" data-delta="1">▲</button><button type="button" class="step-btn" data-delta="-1">▼</button></div></div>
     <label>기본 운영 시간</label><span id="wonderBaseHDisplay" class="setting-value">0 h</span>
     <button id="convertToggle" class="convert-toggle" type="button" aria-expanded="false">생산력 환산표 보기</button>
+    <span id="wonderContext" class="wonder-context" aria-live="polite"></span>
   </div>
 
   <h2>목표 달성 현황</h2>
@@ -479,6 +481,7 @@ function renderBonus(){
     '<div class="bonus-item"><span>추가 일꾼 수</span><b>'+fmtQty(num(w.workers,0))+'명</b></div>'+
     '<div class="bonus-item"><span>다음 일꾼 증가</span><b>'+(w.next===null||w.next===undefined?'최대 레벨':w.next+'레벨')+'</b>'+horusPapyrusNote+'</div>';
 }
+function renderWonderContext(){const el=document.getElementById('wonderContext');if(el)el.textContent='불가사의: '+app.settings.wonder+' · 보너스 Lv.'+app.settings.wLv}
 function resourceRow(name){
   const s=app.resources[name],prod=resourceOutput(name),cons=rawConsumption(name),remain=num(s.stock,0)+prod-cons,time=resourceRequiredHours(name,cons),detail=resourceDetailEnabled(name);
   const levelCell=detail?'<td class="calc detail-active-cell">'+resourceDetailLevelText(name)+'</td>':'<td class="input-cell">'+levelStepper(s.lv)+'</td>';
@@ -750,7 +753,7 @@ function restoreSavedDefault(){try{const s=localStorage.getItem(DEFAULT_STORAGE_
 function restoreFactoryDefault(){applySnapshot(DEFAULTS,'초기화 완료')}
 function openResetChoiceModal(){const modal=document.getElementById('resetChoiceModal');document.getElementById('restoreSavedBtn').disabled=!hasSavedDefault();modal.removeAttribute('hidden');modal.setAttribute('aria-hidden','false');document.body.classList.add('detail-modal-open');postSize()}
 function closeResetChoiceModal(){const modal=document.getElementById('resetChoiceModal');modal.setAttribute('hidden','');modal.setAttribute('aria-hidden','true');document.body.classList.remove('detail-modal-open');document.getElementById('resetBtn')?.focus();postSize()}
-function renderAll(){syncSettingsInputs();renderBonus();renderTables();renderWonder();renderSleepReserve();renderAdjustment();renderConversion();renderDetailLauncher();renderResourceDetailLauncher();postSize()}
+function renderAll(){syncSettingsInputs();renderBonus();renderWonderContext();renderTables();renderWonder();renderSleepReserve();renderAdjustment();renderConversion();renderDetailLauncher();renderResourceDetailLauncher();postSize()}
 
 function incrementStepInput(input,delta){let cur=num(input.value,0),next=Math.round((cur+delta)*1000000)/1000000;if((input.dataset?.k==='hours'||input.dataset?.detailK==='hours'||input.dataset?.resourceDetailK==='hours')&&next<0){input.value='';input.dispatchEvent(new Event('change',{bubbles:true}));return}if(input.min!=='')next=Math.max(num(input.min,next),next);if(input.max!=='')next=Math.min(num(input.max,next),next);input.value=String(next);input.dispatchEvent(new Event('change',{bubbles:true}))}
 document.addEventListener('click',e=>{const btn=e.target.closest('.step-btn');if(!btn)return;const input=btn.closest('.step-wrap')?.querySelector('input');if(!input)return;incrementStepInput(input,num(btn.dataset.delta,0))})
