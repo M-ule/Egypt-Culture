@@ -25,7 +25,7 @@ const load = () => new Function(runtime + `
  productOrder,resourceOrder,productOutput,productTargetNeed,resourceTargetNeed,
  productAdjustment,resourceAdjustment,wonderTime,sleepResourcePower,configs,configHours,
  infoProduct,infoResource,happyCycleOutput,productBenchmarkRate,productLevels,modesForProduct,
- cyclicOutput,CITY_VARIANTS};`)();
+ cyclicOutput,CITY_VARIANTS,normalizeCity,cityGroups};`)();
 function near(actual, expected) { assert(Math.abs(actual - expected) <= 1e-7 * Math.max(1, Math.abs(expected)), `${actual} != ${expected}`); }
 
 test('resource completion respects stops, stock, zero time, and unavailable targets', () => {
@@ -117,4 +117,13 @@ test('random mixed resource schedules agree with an independent completion searc
     for(let k=0;k<64;k++){const mid=(lo+hi)/2;if(output(mid)>=need)hi=mid;else lo=mid;}
     near(actual,hi);
   }
+});
+
+
+test('photo level groups survive reload and drive city totals', () => {
+ const a=load();a.reset();a.state.city=a.normalizeCity({...a.state.city,manual:{Irrigation_Channel:5,Workshop_PapyrusPress:1,City_CityHall:1},photoGroups:{Irrigation_Channel:[{lv:2,count:4},{lv:3,count:1}],Workshop_PapyrusPress:[{lv:3,count:1}],City_CityHall:[{lv:2,count:1}]}});
+ const channel=a.CITY_VARIANTS.Egypt.buildings.find(b=>b.id==='Irrigation_Channel');
+ assert.deepEqual(a.cityGroups(channel).map(g=>g.n),[4,1]);assert.strictEqual(a.cityGroups(channel)[1].l,channel.levels[3]);
+ assert.doesNotThrow(()=>a.cityStats());
+ const restored=a.normalizeCity(JSON.parse(JSON.stringify(a.state.city)));assert.deepEqual(restored.photoGroups.Irrigation_Channel,[{lv:2,count:4},{lv:3,count:1}]);
 });

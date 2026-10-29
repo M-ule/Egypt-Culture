@@ -1,0 +1,3 @@
+.openai/
+preview-dist/
+tests/fixtures/*.jpeg
