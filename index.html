@@ -721,8 +721,20 @@ button.info-tip:focus-visible{box-shadow:0 0 0 2px #f4dbb9}
  .panel{scroll-margin-top:64px}
  #panel-city .bar input,#panel-city .bar select,.bar input,.bar select{font-size:16px}
 }
-</style></head><body><main><h1>이집트 문명 시뮬레이터</h1><div class="legend muted"><span class="chip"></span>노란 칸에 입력</div><nav class="tabs"><button class="tab active" data-tab="prod">생산 계산기</button><button class="tab" data-tab="wonder">불가사의 목표</button><button class="tab" data-tab="city">도시 관리</button></nav><section id="panel-prod" class="panel active"><nav class="mobile-section-nav"><a href="#stage0">기초 자원</a><a href="#stage2">상품</a></nav><div class="card" id="prodSettings"><div class="sectionbar"><h2>생산 설정 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간을 입력하세요. 건물 수는 0.5처럼 나누어 배정할 수 있습니다. 원료·일꾼 부족은 생산량에 자동 반영되지 않으므로 자원 잔액과 도시 관리에서 확인하세요. 운영 시간은 상세 설정, 항목별 시간, 기본 운영 시간 순으로 적용합니다. 빈칸은 앞 단계의 시간을 따르고, 0은 생산하지 않습니다." data-help-extra="bonusBox" aria-label="생산 설정 설명">i</button></h2></div><div class="bar"><label>불가사의<select id="wonderName"><option>아부심벨</option><option>쿠푸왕의 피라미드</option><option>대스핑크스</option><option>호루스의 신전</option></select>
-    </label><label>보너스 적용 레벨<input id="bonusLv" type="number" min="0" max="50"></label><label>기본 운영 시간(h)<input id="baseH" type="number" min="0" step="any"></label><button id="photoImportBtn">사진으로 입력</button><button id="prodView" class="push">상세 보기</button><button id="saveDefaultBtn">생산 입력값 저장</button><button id="resetBtn" class="danger">초기화</button><span id="resetStatus" role="status"></span></div><div id="bonusSummary" class="summary"></div><div id="bonusBox" class="note" hidden></div></div><div id="productionSections"><div class="card" id="stage0"><div class="sectionbar"><h2>기초 자원 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간에 따른 생산량을 상품 생산에 필요한 원료량과 비교합니다." aria-label="기초 자원 설명">i</button></h2><button id="resourceDetailOpen">자원 상세 설정</button></div><div class="wrap"><table class="prodtable" id="tResource"><thead><tr>
+
+/* Save/load are adjacent actions, including on narrow phones. */
+button:disabled{cursor:not-allowed;opacity:.55}
+button.detail-badge{font-size:12px;line-height:1.4;white-space:nowrap;min-height:30px;min-width:64px;padding:4px 7px;background:#fff8df;border-color:#b7953e;color:#65512d}
+button.detail-badge:hover{background:#eee2b3}
+#resetStatus{line-height:1.5;overflow-wrap:anywhere}
+@media(max-width:720px){
+ #prodSettings .bar>button:not(.info-tip){flex:1 1 calc(50% - 10px);min-height:44px;margin:0;order:2}
+ #prodSettings .bar>#prodView{order:3;flex-basis:100%;width:100%}
+ #resetStatus{order:4;flex-basis:100%}
+ button.detail-badge{min-height:36px}
+}
+</style></head><body><main><h1>이집트 문명 시뮬레이터</h1><div class="legend muted"><span class="chip"></span>노란 칸에 입력</div><nav class="tabs"><button class="tab active" data-tab="prod">생산 계산기</button><button class="tab" data-tab="wonder">불가사의 목표</button><button class="tab" data-tab="city">도시 관리</button></nav><section id="panel-prod" class="panel active"><nav class="mobile-section-nav"><a href="#stage0">기초 자원</a><a href="#stage2">상품</a></nav><div class="card" id="prodSettings"><div class="sectionbar"><h2>생산 설정 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간을 입력하세요. 건물 수는 0.5처럼 나누어 배정할 수 있습니다. 원료·일꾼 부족은 생산량에 자동 반영되지 않으므로 자원 잔액과 도시 관리에서 확인하세요. 입력은 자동으로 유지되며, ‘생산 입력값 저장’으로 별도 저장한 값은 ‘저장값 불러오기’로 되돌릴 수 있습니다. 저장값은 이 기기·브라우저에서만 사용할 수 있습니다. 운영 시간은 상세 설정, 항목별 시간, 기본 운영 시간 순으로 적용합니다. 빈칸은 앞 단계의 시간을 따르고, 0은 생산하지 않습니다." data-help-extra="bonusBox" aria-label="생산 설정 설명">i</button></h2></div><div class="bar"><label>불가사의<select id="wonderName"><option>아부심벨</option><option>쿠푸왕의 피라미드</option><option>대스핑크스</option><option>호루스의 신전</option></select>
+    </label><label>보너스 적용 레벨<input id="bonusLv" type="number" min="0" max="50"></label><label>기본 운영 시간(h)<input id="baseH" type="number" min="0" step="any"></label><button id="photoImportBtn">사진으로 입력</button><button id="prodView" class="push">상세 보기</button><button id="saveDefaultBtn">생산 입력값 저장</button><button id="loadDefaultBtn" type="button">저장값 불러오기</button><button id="resetBtn" class="danger">초기화</button><span id="resetStatus" role="status"></span></div><div id="bonusSummary" class="summary"></div><div id="bonusBox" class="note" hidden></div></div><div id="productionSections"><div class="card" id="stage0"><div class="sectionbar"><h2>기초 자원 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간에 따른 생산량을 상품 생산에 필요한 원료량과 비교합니다." aria-label="기초 자원 설명">i</button></h2><button id="resourceDetailOpen">자원 상세 설정</button></div><div class="wrap"><table class="prodtable" id="tResource"><thead><tr>
     <th>자원</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>잔여/부족</th><th>예상 생산량</th><th>필요량</th><th>소요 시간</th>
   </tr></thead><tbody></tbody></table></div><span id="resourceDetailSummary" class="muted"></span></div><div class="card" id="stage2"><div class="sectionbar"><h2>상품 <button type="button" class="info-tip" data-tip="완료한 생산 주기를 기준으로 생산량과 데벤·원료 사용량을 계산합니다." aria-label="상품 설명">i</button></h2><button id="productDetailOpen">상품 상세 설정</button></div><div class="wrap"><table class="prodtable" id="tProduct"><thead><tr>
     <th>상품</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>예상 생산량</th><th>데벤 사용량</th><th>파피루스 사용량</th><th>금 사용량</th>
@@ -771,7 +783,7 @@ button.info-tip:focus-visible{box-shadow:0 0 0 2px #f4dbb9}
   <div class="detail-backdrop" data-reset-close></div>
   <section class="detail-sheet reset-choice-sheet" role="dialog" aria-modal="true" aria-labelledby="resetChoiceTitle">
     <div class="detail-head">
-      <div><h3 id="resetChoiceTitle">초기화 방식 선택</h3><p>현재 불가사의 종류는 유지됩니다.</p></div>
+      <div><h3 id="resetChoiceTitle">생산 입력 초기화</h3><p>생산 입력만 변경합니다. 불가사의 목표와 도시 관리 입력은 유지됩니다.</p></div>
       <button type="button" class="detail-close" data-reset-close aria-label="닫기">×</button>
     </div>
     <div class="reset-choice-actions">
@@ -972,7 +984,7 @@ function resourceRow(name){
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(resourceActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
   const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'기본')+'</td>';
-  return '<tr data-group="resources" data-name="'+name+'"><td class="name">'+displayName(name)+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+
+  return '<tr data-group="resources" data-name="'+name+'"><td class="name">'+displayName(name)+(detail?'<button type="button" class="detail-badge" data-open-composition="'+name+'" aria-label="'+displayName(name)+' 상세 설정 수정">상세 수정</button>':'')+'</td>'+levelCell+
     '<td class="fixed-input">연속</td>'+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td>'+
     '<td class="num calc '+remainClass(remain)+'">'+fmtQty(remain)+'</td><td class="num calc">'+fmtQty(prod)+'</td><td class="num calc">'+fmtQty(cons)+'</td><td class="num calc">'+(time===null?'—':duration(time))+'</td></tr>'
@@ -987,7 +999,7 @@ function productRow(name){
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(productActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
   const hoursCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+stepper('hours',s.hours,'기본')+'</td>';
-  return '<tr data-group="products" data-name="'+name+'"><td class="name">'+displayName(name)+(detail?'<span class="detail-badge">상세</span>':'')+'</td>'+levelCell+modeCell+bldgCell+happyCell+hoursCell+
+  return '<tr data-group="products" data-name="'+name+'"><td class="name">'+displayName(name)+(detail?'<button type="button" class="detail-badge" data-open-composition="'+name+'" aria-label="'+displayName(name)+' 상세 설정 수정">상세 수정</button>':'')+'</td>'+levelCell+modeCell+bldgCell+happyCell+hoursCell+
     '<td class="input-cell"><input type="number" class="stock-input" data-k="stock" value="'+s.stock+'" step="1"></td><td class="num calc">'+fmtQty(out)+'</td>'+
     '<td class="num calc">'+fmtQty(productUse(name,'currency'))+'</td><td class="num calc">'+fmtQty(productUse(name,'파피루스'))+'</td><td class="num calc">'+fmtQty(productUse(name,'금'))+'</td></tr>'
 }
@@ -1398,7 +1410,7 @@ function labelTables(){
  for(const t of document.querySelectorAll('table')){
   const headers=[...t.querySelectorAll('thead th')].map(th=>th.dataset.label||th.textContent.trim());
   t.querySelectorAll('thead th').forEach((th,i)=>{th.dataset.label=headers[i];const tip=TOOLTIPS[headers[i]];if(tip&&!th.querySelector('.info-tip'))th.innerHTML=safeText(headers[i])+' '+helpButton(headers[i],tip);});
-  for(const row of t.querySelectorAll('tbody tr'))[...row.cells].forEach((td,i)=>{td.dataset.label=headers[i]||'';td.querySelector(':scope > .mobilelabel')?.remove();if(i&&t.id!=='tConvert'){const span=document.createElement('span');span.className='mobilelabel';span.textContent=headers[i]||'';td.prepend(span);}td.querySelectorAll('input,select').forEach(el=>el.setAttribute('aria-label',(row.cells[0]?.querySelector('select')?.selectedOptions[0]?.textContent||row.cells[0]?.textContent||'항목')+' '+headers[i]));});
+  for(const row of t.querySelectorAll('tbody tr'))[...row.cells].forEach((td,i)=>{td.dataset.label=headers[i]||'';td.querySelector(':scope > .mobilelabel')?.remove();if(i&&t.id!=='tConvert'){const span=document.createElement('span');span.className='mobilelabel';span.textContent=headers[i]||'';td.prepend(span);}td.querySelectorAll('input,select').forEach(el=>el.setAttribute('aria-label',(row.dataset.name||row.cells[0]?.querySelector('select')?.selectedOptions[0]?.textContent||row.cells[0]?.textContent||'항목')+' '+headers[i]));});
  }
  const inputHelp={bonusLv:'현재 적용받는 불가사의 보너스 레벨입니다.',baseH:'운영 시간을 따로 입력하지 않은 항목에 공통으로 적용됩니다.',sleepPrepH:'취침 전까지 남은 시간입니다. 건물별 운영 시간과 이 시간 중 짧은 시간을 적용하며, 비우면 기본 운영 시간을 사용합니다.',sleepCycle:'취침 전에 예약할 주기입니다. 해당 레벨에 없는 주기는 가장 긴 생산 주기로 적용합니다.',sleepCount:'건물 1채당 예약할 생산 횟수입니다. 모든 횟수에 필요한 원료를 취침 전까지 확보해야 합니다.',productRawCycle:'목표 상품 부족분의 원료량을 환산할 기준 주기입니다. Lv6·행복도 100% 기준이며 현재 생산 설정은 바꾸지 않습니다.'};
  for(const [id,tip]of Object.entries(inputHelp)){const input=$(id),label=input?.closest('label');if(label&&!label.querySelector('.info-tip'))input.insertAdjacentHTML('beforebegin',' '+helpButton(label.firstChild.textContent.trim(),tip)+' ');}
@@ -1414,7 +1426,12 @@ function renderProductionSummary(){
  if(app.settings.wonder==='호루스의 신전')values.push('데벤 +'+fmtPct(horusDebenBonus()));
  values.push('일꾼 +'+fmtQty(workerInfo().workers)+'명');
  const short=resourceOrder.filter(n=>num(app.resources[n].stock)+resourceOutput(n)-rawConsumption(n)<-1e-8);
- $('bonusSummary').innerHTML=metric('불가사의 보너스',values.join(' · '))+itemSummary('조정 필요 생산 항목',short,short.length?'bad':'');
+ const rows=[...resourceOrder.flatMap(n=>configs('resources',n).map(r=>({count:r.count,hours:configHours('resources',n,r)}))),...productOrder.flatMap(n=>configs('products',n).map(r=>({count:r.count,hours:configHours('products',n,r)})))];
+ const configured=rows.some(r=>r.count>0),operating=rows.some(r=>r.count>0&&r.hours>0);
+ const status=!configured?metric('생산 설정 확인','건물 수를 입력하세요.'):!operating?metric('생산 설정 확인','운영 시간을 입력하세요.') :itemSummary('조정 필요 생산 항목',short,short.length?'bad':'');
+ $('bonusSummary').innerHTML=metric('불가사의 보너스',values.join(' · '))+status;
+ const load=$('loadDefaultBtn');if(load){load.disabled=!hasSavedDefault();load.title=load.disabled?'저장한 생산 입력값이 없습니다.':'이 기기에 저장한 생산 입력값을 불러옵니다.';}
+
 }
 renderWonder=function(){
  oldRenderWonder();
@@ -1429,9 +1446,14 @@ renderSleepReserve=function(){oldRenderSleep();$('sleepActual').textContent='실
 restoreFactoryDefault=function(){const d=clone(DEFAULTS);d.settings.wonder=app.settings.wonder;applySnapshot(d,'생산 계산기 초기화 완료');};
 function productionSnapshot(){return {settings:{wonder:app.settings.wonder,wLv:app.settings.wLv,baseH:app.settings.baseH},resources:clone(app.resources),products:clone(app.products),details:clone(app.details),resourceDetails:clone(app.resourceDetails)};}
 applySnapshot=function(snapshot,message){const d=normalizeLoaded(snapshot);for(const k of ['wonder','wLv','baseH'])app.settings[k]=d.settings[k];for(const k of ['resources','products','details','resourceDetails'])app[k]=clone(d[k]);normalizeDetails();normalizeResourceDetails();renderAll();saveState();showResetStatus(message);};
-saveUserDefault=function(){try{localStorage.setItem(DEFAULT_STORAGE_KEY,JSON.stringify(productionSnapshot()));showResetStatus('생산 입력값 저장 완료');}catch(e){showResetStatus('저장 실패');}};
+saveUserDefault=function(){
+ const invalid=document.querySelector('#panel-prod [aria-invalid="true"]');if(invalid){invalid.focus();showResetStatus('입력 오류를 수정한 후 저장하세요.');return;}
+ try{localStorage.setItem(DEFAULT_STORAGE_KEY,JSON.stringify(productionSnapshot()));$('loadDefaultBtn').disabled=false;$('loadDefaultBtn').title='이 기기에 저장한 생산 입력값을 불러옵니다.';showResetStatus('생산 입력값 저장 완료');}catch(e){showResetStatus('저장 실패');}
+};
 // Replace the previously bound handler with the production-only save flow.
 $('saveDefaultBtn').replaceWith($('saveDefaultBtn').cloneNode(true));$('saveDefaultBtn').onclick=saveUserDefault;
+$('loadDefaultBtn').onclick=()=>restoreSavedDefault();
+document.addEventListener('click',e=>{const button=e.target.closest('[data-open-composition]');if(!button)return;const name=button.dataset.openComposition;if(resourceOrder.includes(name))openResourceDetailModal(name);else if(productOrder.includes(name))openDetailModal(name);});
 function cityGroups(b){if(b.id==='City_CityHall')return [{n:1,l:b.levels[1],h:0}];const home=app.city.homes[b.id];if(home)return [{n:home.count,l:b.levels[home.lv],h:home.happiness}];if(app.city.manual[b.id]!==undefined)return [{n:app.city.manual[b.id],l:b.levels[1],h:0}];return (CITY_MAP[b.id]||[]).flatMap(name=>configs(resourceOrder.includes(name)?'resources':'products',name).map(r=>({n:r.count,l:b.levels[r.lv],h:r.irrigation})));}
 function researchClosure(ids){const out=new Set(),add=id=>{if(out.has(id))return;const t=CITY_VARIANTS.Egypt.research.find(t=>t.id===id);if(!t)return;out.add(id);t.parents.forEach(add);};ids.forEach(add);return out;}
 function sumCosts(rows){const out={};for(const c of rows)for(const [k,v]of Object.entries(c))out[k]=(out[k]||0)+v;return out;}
