@@ -1410,6 +1410,29 @@ function showTermHelp(info){
  $('termHelpBody').textContent=info.dataset.tip+(extra?'\n\n'+extra.textContent:'')+(fields.length?'\n\n'+fields.map(label=>label+'\n'+TOOLTIPS[label]).join('\n\n'):'');
  if(!box.open)box.showModal();
 }
+// Compact hover/focus help; touch keeps the full help dialog.
+let activeTermTip=null;
+function hideTermTooltip(){
+ if(!activeTermTip)return;
+ const {info,box}=activeTermTip;
+ info.removeAttribute('aria-describedby');box.remove();activeTermTip=null;
+}
+function showTermTooltip(info){
+ hideTermTooltip();
+ const box=document.createElement('div');box.id='termHoverTooltip';box.className='term-tooltip show';box.setAttribute('role','tooltip');box.textContent=info.dataset.tip;
+ (info.closest('dialog[open]')||document.body).append(box);
+ info.setAttribute('aria-describedby',box.id);activeTermTip={info,box};
+ const r=info.getBoundingClientRect(),b=box.getBoundingClientRect(),gap=8;
+ box.style.left=Math.max(12,Math.min(r.left+r.width/2-b.width/2,innerWidth-b.width-12))+'px';
+ box.style.top=Math.max(12,Math.min(r.top-b.height-gap>=12?r.top-b.height-gap:r.bottom+gap,innerHeight-b.height-12))+'px';
+}
+document.addEventListener('pointerover',e=>{const info=e.target.closest('.info-tip');if(info&&e.pointerType==='mouse'&&!info.contains(e.relatedTarget))showTermTooltip(info);});
+document.addEventListener('pointerout',e=>{const info=e.target.closest('.info-tip');if(info&&!info.contains(e.relatedTarget))hideTermTooltip();});
+document.addEventListener('focusin',e=>{const info=e.target.closest('.info-tip');if(info&&info.matches(':focus-visible'))showTermTooltip(info);});
+document.addEventListener('focusout',e=>{if(e.target.closest('.info-tip'))hideTermTooltip();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTermTooltip();});
+document.addEventListener('scroll',hideTermTooltip,true);
+window.addEventListener('resize',hideTermTooltip);
 function labelTables(){
  for(const t of document.querySelectorAll('table')){
   const headers=[...t.querySelectorAll('thead th')].map(th=>th.dataset.label||th.textContent.trim());
@@ -1481,7 +1504,7 @@ for(const key of ['prod','wonder','city'])$(key+'View').onclick=()=>{app.views[k
 for(const id of ['curLv','tgtLv','sleepPrepH','sleepCycle','sleepCount','productRawCycle'])$(id).addEventListener('change',()=>{renderAll();saveState();});
 $('cityReset').onclick=()=>{app.city=cityDefault();renderAll();saveState();};$('researchReset').onclick=()=>{app.city.current=[];app.city.target=[];renderAll();saveState();};$('addConstruction').onclick=()=>{app.city.construction.push({id:'Home_Small',cur:0,tgt:1,count:1});renderAll();saveState();};
 $('panel-city').addEventListener('change',e=>{const el=e.target,c=app.city,fields={landPlots:'land',debenStock:'debenStock',debenRate:'debenRate',debenHours:'debenHours'};if(fields[el.id])c[fields[el.id]]=el.value===''&&el.id!=='debenStock'?'':num(el.value);else if(el.dataset.home)c.homes[el.dataset.home][el.dataset.field]=num(el.value);else if(el.dataset.cityBuilding){delete c.photoGroups?.[el.dataset.cityBuilding];if(el.value==='')delete c.manual[el.dataset.cityBuilding];else c.manual[el.dataset.cityBuilding]=num(el.value);}else if(el.dataset.con!==undefined)c.construction[Number(el.dataset.con)][el.dataset.field]=el.dataset.field==='id'?el.value:num(el.value);else return;app.city=normalizeCity(c);renderAll();saveState();});
-document.addEventListener('click',e=>{const close=e.target.closest('[data-close]');if(close)$(close.dataset.close).close();const sync=e.target.closest('[data-city-sync]');if(sync){delete app.city.manual[sync.dataset.citySync];delete app.city.photoGroups?.[sync.dataset.citySync];renderAll();saveState();}const rem=e.target.closest('[data-remove-con]');if(rem){app.city.construction.splice(Number(rem.dataset.removeCon),1);renderAll();saveState();}const f=e.target.closest('[data-research-filter]');if(f){researchFilter=f.dataset.researchFilter;renderResearch();}const tech=e.target.closest('[data-tech]');if(tech){activeTech=tech.dataset.tech;const t=CITY_VARIANTS.Egypt.research.find(t=>t.id===activeTech);$('researchTitle').textContent=t.name;$('researchInfo').textContent='연구 비용 '+money(t.costs);$('currentResearch').textContent=researchClosure(app.city.current).has(activeTech)?'완료 지정 해제':'현재 완료로 지정';$('targetResearch').textContent=app.city.target.includes(activeTech)?'목표 지정 해제':'목표 연구로 지정';$('researchDialog').showModal();}const info=e.target.closest('.info-tip');if(info){e.preventDefault();showTermHelp(info);}});
+document.addEventListener('click',e=>{const close=e.target.closest('[data-close]');if(close)$(close.dataset.close).close();const sync=e.target.closest('[data-city-sync]');if(sync){delete app.city.manual[sync.dataset.citySync];delete app.city.photoGroups?.[sync.dataset.citySync];renderAll();saveState();}const rem=e.target.closest('[data-remove-con]');if(rem){app.city.construction.splice(Number(rem.dataset.removeCon),1);renderAll();saveState();}const f=e.target.closest('[data-research-filter]');if(f){researchFilter=f.dataset.researchFilter;renderResearch();}const tech=e.target.closest('[data-tech]');if(tech){activeTech=tech.dataset.tech;const t=CITY_VARIANTS.Egypt.research.find(t=>t.id===activeTech);$('researchTitle').textContent=t.name;$('researchInfo').textContent='연구 비용 '+money(t.costs);$('currentResearch').textContent=researchClosure(app.city.current).has(activeTech)?'완료 지정 해제':'현재 완료로 지정';$('targetResearch').textContent=app.city.target.includes(activeTech)?'목표 지정 해제':'목표 연구로 지정';$('researchDialog').showModal();}const info=e.target.closest('.info-tip');if(info){e.preventDefault();hideTermTooltip();if(e.detail===0||!matchMedia('(hover: hover) and (pointer: fine)').matches)showTermHelp(info);else showTermTooltip(info);}});
 for(const [id,key]of [['currentResearch','current'],['targetResearch','target']])$(id).onclick=()=>{const list=app.city[key];if(key==='current'&&researchClosure(list).has(activeTech))app.city.current=list.filter(id=>!researchClosure([id]).has(activeTech));else {const j=list.indexOf(activeTech);if(j<0)list.push(activeTech);else list.splice(j,1);}$('researchDialog').close();renderAll();saveState();};
 function initializeNavigation(){
  const tabs=[...document.querySelectorAll('.tabs .tab')];let restoring=true;
