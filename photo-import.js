@@ -1,14 +1,14 @@
 /* Name-anchored Egypt screenshot import. OCR stays in the visitor's browser. */
 (()=>{'use strict';
 const el=id=>document.getElementById(id),BUILDINGS=[
-{id:'papyrus',name:'파피루스 밭',aliases:['파피루스밭','파피루스농장'],resource:'파피루스',city:'PapyrusField_Average'},
+{id:'papyrus',name:'파피루스 들판',aliases:['파피루스들판','파피루스밭','파피루스농장'],resource:'파피루스',city:'PapyrusField_Average'},
 {id:'goldmine',name:'금광',aliases:['금광'],resource:'금',city:'GoldMine_Average'},
 {id:'press',name:'파피루스 압축장',aliases:['파피루스압축장','파피루스압착소','파피루스제작소','파피루스공방'],city:'Workshop_PapyrusPress'},
 {id:'smith',name:'금세공인',aliases:['금세공인','금세공소','금세공장'],city:'Workshop_Goldsmith'},
 {id:'smallhome',name:'소형 집',aliases:['소형집','작은주택','소형주택'],home:'Home_Small'},
 {id:'home',name:'주택',aliases:['주택'],home:'Home_Average'},
 {id:'premiumhome',name:'호화 주택',aliases:['호화주택'],home:'Home_Premium'}
-,{id:'well',name:'소형 우물',aliases:['소형우물','작은우물'],city:'Irrigation_SmallWell'},{id:'channel',name:'수로',aliases:['수로'],city:'Irrigation_Channel'},{id:'hall',name:'시청',aliases:['시청'],city:'City_CityHall'},{id:'oasis',name:'오아시스',aliases:['오아시스'],city:'Irrigation_Oasis'},{id:'pump',name:'양수기',aliases:['양수기'],city:'Irrigation_WaterPump'},{id:'irrigation',name:'관개 시설',aliases:['관개시설'],city:'Irrigation_IrrigationStation'},{id:'fountain',name:'분수',aliases:['분수'],city:'Irrigation_Fountain'},{id:'premiumgold',name:'호화 금광',aliases:['호화금광','고급금광'],city:'GoldMine_Premium'},{id:'premiumfield',name:'호화 파피루스 밭',aliases:['호화파피루스밭','고급파피루스밭'],city:'PapyrusField_Premium'}],STOCKS=[{name:'데벤',target:'deben'},...resourceOrder.map(name=>({name,target:name})),...productOrder.map(name=>({name,target:name}))];
+,{id:'well',name:'소형 우물',aliases:['소형우물','작은우물'],city:'Irrigation_SmallWell'},{id:'channel',name:'수로',aliases:['수로'],city:'Irrigation_Channel'},{id:'hall',name:'시청',aliases:['시청'],city:'City_CityHall'},{id:'oasis',name:'오아시스',aliases:['오아시스'],city:'Irrigation_Oasis'},{id:'pump',name:'물 펌프',aliases:['물펌프','양수기'],city:'Irrigation_WaterPump'},{id:'irrigation',name:'관개 시설',aliases:['관개시설'],city:'Irrigation_IrrigationStation'},{id:'fountain',name:'분수',aliases:['분수'],city:'Irrigation_Fountain'},{id:'premiumgold',name:'호화 금광',aliases:['호화금광','고급금광'],city:'GoldMine_Premium'},{id:'premiumfield',name:'호화 파피루스 밭',aliases:['호화파피루스밭','고급파피루스밭'],city:'PapyrusField_Premium'}],STOCKS=[{name:'데벤',target:'deben'},...resourceOrder.map(name=>({name,target:name})),...productOrder.map(name=>({name,target:name}))];
 let worker=null,busy=false,findings=[];
 const clean=s=>String(s).replace(/\s|[·:：]/g,'');
 function status(s,bad=false){el('photoStatus').textContent=s;el('photoStatus').classList.toggle('bad',bad);}
