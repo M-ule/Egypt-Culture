@@ -32,3 +32,21 @@ Tests require `@napi-rs/canvas` (available in the Codex runtime):
 
 The visual baseline covers these screens and resampling variants. Unmatched names
 use browser OCR. Recognition is a review step; values are applied only after selection.
+
+## 2026-10-31 regression photos
+
+The current local photos are `egypt-current-buildings.jpeg` and
+`egypt-current-stocks.jpeg`. They remain excluded from Git. Run
+`node tools/extend-current-patterns.cjs` from the repository root to append
+individual name/digit samples, including resized variants, without replacing
+older samples. This generator does not store complete card values.
+
+Expected visible cards: 파피루스 들판 Lv4 ×4, 금광 Lv4 ×3, 물 펌프 Lv2 ×4,
+수로 Lv4 ×8, 시청 Lv2 ×1, 파피루스 압축장 Lv4 ×2, 금세공인 Lv4 ×2,
+소형 집 Lv4 ×30. Stocks: 데벤 143.2K, 파피루스 209.7K, 금 75,613,
+두루마리 344, 앙크 178, 예복 0, 황금 가면 0.
+
+Current regression tests check all 23 fields through selection and state
+application, changed badge glyphs, moved cards, and resampling. Resampled text
+may still require confirmation or supplemental OCR; it must never silently
+substitute a wrong value.
