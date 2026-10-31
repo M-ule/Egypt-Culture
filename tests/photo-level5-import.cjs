@@ -1,0 +1,17 @@
+const {test:nodeTest}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const test=fs.existsSync(path.join(__dirname,'fixtures','egypt-level5-buildings.jpeg'))&&fs.existsSync(path.join(__dirname,'fixtures','egypt-level5-stocks.jpeg'))?nodeTest:nodeTest.skip;
+const {createCanvas,Image}=require('@napi-rs/canvas');
+test('level-five photos apply two channel levels and all inventory without remote OCR',async()=>{
+ const nodes=new Map(),get=id=>{if(!nodes.has(id))nodes.set(id,{files:[],value:'',disabled:false,innerHTML:'',textContent:'',classList:{toggle(){}},close(){this.closed=true;},showModal(){}});return nodes.get(id);};
+ const app={city:{debenStock:0,homes:{Home_Small:{lv:1,count:30,happiness:100}},manual:{},photoGroups:{}},resources:{'파피루스':{stock:0},'금':{stock:0}},products:Object.fromEntries(['파피루스 두루마리','앙크','예복','황금 가면'].map(n=>[n,{stock:0}])),resourceDetails:{}};
+ const document={getElementById:get,createElement:tag=>{assert.equal(tag,'canvas','known fixtures need no remote OCR engine');return createCanvas(1,1);},querySelectorAll:()=>[...get('photoReview').innerHTML.matchAll(/data-photo-check="(\d+)" checked/g)].map(m=>({dataset:{photoCheck:m[1]}})),querySelector:selector=>{const i=selector.match(/"(\d+)"/)[1],m=[...get('photoReview').innerHTML.matchAll(/data-photo-value="(\d+)" value="([^"]*)"/g)].find(m=>m[1]===i);return {value:m[2]};}};
+ let saves=0;const env={window:{},document,app,Image,URL:{createObjectURL:file=>file.path,revokeObjectURL(){}},setTimeout,resourceOrder:['파피루스','금'],productOrder:['파피루스 두루마리','앙크','예복','황금 가면'],parseAmountInput:s=>/^\d+(\.\d+)?$/.test(s)?Number(s):null,safeText:s=>s,resourceDetailEnabled:()=>false,renderAll(){},saveState(){saves++;},confirm:()=>true};vm.createContext(env);
+ for(const file of ['photo-digit-patterns.js','photo-patterns.js','photo-vision.js','photo-import.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'..',file),'utf8'),env);
+ const file=kind=>({type:'image/jpeg',size:1000,path:path.join(__dirname,'fixtures','egypt-level5-'+kind+'.jpeg')});get('photoBuildings').files=[file('buildings')];get('photoStocks').files=[file('stocks')];await get('photoScan').onclick();assert.match(get('photoStatus').textContent,/23개/);assert.doesNotMatch(get('photoStatus').textContent,/추가 확인/);get('photoApply').onclick();assert.equal(saves,1);
+ assert.equal(app.city.homes.Home_Small.count,30); // Houses are below the visible list; preserve existing state.
+ for(const [id,lv,count]of [['Irrigation_WaterPump',4,5],['City_CityHall',2,1],['Workshop_PapyrusPress',5,2],['Workshop_Goldsmith',5,2]]){assert.equal(app.city.manual[id],count);assert.deepEqual(JSON.parse(JSON.stringify(app.city.photoGroups[id])),[{lv,count}]);}
+ assert.equal(app.city.manual.Irrigation_Channel,8);assert.deepEqual(JSON.parse(JSON.stringify(app.city.photoGroups.Irrigation_Channel)),[{lv:4,count:2},{lv:5,count:6}]);
+ for(const [name,count]of [['파피루스',5],['금',5]]){assert.equal(app.resources[name].bldgs,count);assert.equal(app.resources[name].lv,5);assert.equal(app.resourceDetails[name].rows[0].count,count);}
+ assert.equal(app.city.debenStock,740900);assert.equal(app.resources['파피루스'].stock,319700);assert.equal(app.resources['금'].stock,265000);
+ assert.deepEqual(Object.fromEntries(Object.entries(app.products).map(([k,v])=>[k,v.stock])),{'파피루스 두루마리':13441,'앙크':10093,'예복':3,'황금 가면':19});
+});
