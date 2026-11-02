@@ -743,7 +743,7 @@ button.detail-badge:hover{background:#eee2b3}
   </tr></thead><tbody></tbody></table></div></div></div><div class="card" id="sleepCard"><div class="sectionbar"><h2>수면 대비 자원 확보 <button type="button" class="info-tip" data-tip="취침 전까지 예약 생산에 필요한 원료를 확보할 수 있는지 확인합니다. 현재 보유량과 취침 전 생산·소비를 반영하며, 수면 중 자원 생산량은 포함하지 않습니다." data-help-extra="sleepActual" aria-label="수면 대비 자원 확보 설명">i</button></h2></div><div class="bar"><label>수면까지 남은 시간(h)<input id="sleepPrepH" type="number" min="0" step="any" placeholder="기본"></label><label>수면 중 생산 주기<select id="sleepCycle"><option value="최장">레벨별 최장</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
     </label><label>생산 횟수<input id="sleepCount" type="number" min="0"></label></div><div id="sleepActual" class="note" hidden></div><div id="sleepTable"><div class="wrap"><table class="result-table" id="tSleep"><thead><tr>
     <th>자원</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th><th>필요량</th><th>예상 확보량</th><th>잔여/부족</th>
-  </tr></thead><tbody></tbody></table></div></div></div><div class="card" id="powerCard"><div class="sectionbar"><h2>목표 레벨 생산력 비교 <button type="button" class="info-tip" data-tip="현재 생산력과 목표 달성에 필요한 생산력을 비교합니다. 상세 설정의 운영 시간이 다르면 가장 긴 운영 시간을 비교 기준으로 삼고, 각 건물 생산량은 개별 운영 시간을 따릅니다. 원료 필요량은 부족한 상품만 Lv6·행복도 100%·선택한 주기로 환산합니다." aria-label="목표 레벨 생산력 비교 설명">i</button></h2></div><div class="bar"><label>필요량 환산 기준 주기<select id="productRawCycle"><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
+  </tr></thead><tbody></tbody></table></div></div></div><div class="card" id="powerCard"><div class="sectionbar"><h2>목표 레벨 생산력 비교 <button type="button" class="info-tip" data-tip="현재 생산력과 목표 달성에 필요한 생산력을 비교합니다. 상세 설정의 운영 시간이 다르면 가장 긴 운영 시간을 비교 기준으로 삼고, 각 건물 생산량은 개별 운영 시간을 따릅니다. 원료 필요량은 부족한 상품만 Lv6·행복도 100%·선택한 주기로 환산합니다." aria-label="목표 레벨 생산력 비교 설명">i</button></h2></div><div class="bar"><label>필요량 환산 기준 주기<select id="productRawCycle"><option value="생산 계산기값">생산 계산기값</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
   </label></div><div id="powerTable"><div class="wrap"><table class="result-table" id="tPower"><thead><tr>
       <th>생산 항목</th><th>생산력 차이</th><th>현재 생산력</th><th>필요 생산력</th>
     </tr></thead><tbody></tbody></table></div></div></div><div class="card" id="conversionCard"><div class="sectionbar"><h2>생산력 환산표 <button type="button" class="info-tip" data-tip="생산력 100은 Lv6·행복도 100%인 건물 1채의 기준 생산력입니다. 상품은 30분 주기, 자원은 연속 생산을 기준으로 합니다." aria-label="생산력 환산표 설명">i</button></h2></div><button id="convertToggle" hidden>생산력 환산표 보기</button><div id="convertPanel"><div class="wrap"><table class="result-table" id="tConvert"><colgroup><col class="conversion-name"><col class="conversion-mode"><col span="6"></colgroup><thead><tr>
@@ -810,7 +810,7 @@ const HORUS_PAPYRUS_BASE={1:4200,2:6300,3:9500,4:15000,5:22000,6:32000};
 const wonderNames=['아부심벨','쿠푸왕의 피라미드','대스핑크스','호루스의 신전'];
 
 const DEFAULTS={
-  settings:{wonder:'아부심벨',wLv:0,baseH:0,sleepPrepH:'',sleepCycle:'최장',sleepCount:3,productRawCycle:'30분'},
+  settings:{wonder:'아부심벨',wLv:0,baseH:0,sleepPrepH:'',sleepCycle:'최장',sleepCount:3,productRawCycle:'생산 계산기값',productRawCycleVersion:1},
   resources:{
     '파피루스':{lv:1,bldgs:0,irrigation:100,hours:'',stock:0},
     '금':{lv:1,bldgs:0,irrigation:100,hours:'',stock:0}
@@ -1124,11 +1124,25 @@ function requiredPowerFromAmount(amount,hours,benchmarkRate){
 }
 function productRequiredPower(name){return requiredPowerFromAmount(productTargetNeed(name),effectiveHours('products',name),productBenchmarkRate(name))}
 function productBenchmarkRawRatio(name,raw){
-  const mode=['30분','1시간','2시간'].includes(app.settings.productRawCycle)?app.settings.productRawCycle:'30분';
-  const p=infoProduct(name,6,mode);if(!p)return null;
-  if(p.raw!==raw)return 0;
-  const out=happyCycleOutput(p,100);if(!(out>0))return null;
-  return p.rawUse/out
+  const ratioForMode=mode=>{
+    const p=infoProduct(name,6,closestModeForLevel(name,6,mode));if(!p)return null;
+    if(p.raw!==raw)return 0;
+    const out=happyCycleOutput(p,100);return out>0?p.rawUse/out:null;
+  };
+  if(['30분','1시간','2시간'].includes(app.settings.productRawCycle))return ratioForMode(app.settings.productRawCycle);
+  if(!detailEnabled(name))return ratioForMode(app.products[name].mode);
+  // Only the cycle is inherited. Keep Lv6 / 100% as the conversion benchmark.
+  const rows=configs('products',name).filter(r=>num(r.count)>0);
+  const timed=rows.some(r=>configHours('products',name,r)>0);
+  let output=0,rawUse=0;
+  for(const row of rows){
+    const p=infoProduct(name,6,closestModeForLevel(name,6,row.mode));if(!p)return null;
+    const hours=timed?configHours('products',name,row):1;
+    const weight=Math.max(0,num(row.count))*hours/(p.min/60);
+    output+=happyCycleOutput(p,100)*weight;
+    if(p.raw===raw)rawUse+=p.rawUse*weight;
+  }
+  return output>0?rawUse/output:ratioForMode(app.products[name].mode);
 }
 function rawRequirementForAmount(name,raw,amount){
   amount=Math.max(0,num(amount,0));if(amount<=1e-10)return 0;
@@ -1233,7 +1247,7 @@ function normalizeLoaded(obj){
     if(obj.details)for(const n of productOrder)Object.assign(d.details[n],obj.details[n]||{});
     if(obj.resourceDetails)for(const n of resourceOrder)Object.assign(d.resourceDetails[n],obj.resourceDetails[n]||{})
   }
-  if(!wonderNames.includes(d.settings.wonder))d.settings.wonder='아부심벨';d.settings.wLv=clamp(parseInt(d.settings.wLv)||0,0,50);d.settings.baseH=Math.max(0,num(d.settings.baseH,0));d.settings.sleepPrepH=d.settings.sleepPrepH===''||d.settings.sleepPrepH===null||d.settings.sleepPrepH===undefined?'':Math.max(0,num(d.settings.sleepPrepH,0));if(!['최장','30분','1시간','2시간'].includes(d.settings.sleepCycle))d.settings.sleepCycle='최장';d.settings.sleepCount=Math.max(0,Math.floor(num(d.settings.sleepCount,3)));if(!['30분','1시간','2시간'].includes(d.settings.productRawCycle))d.settings.productRawCycle='30분';
+  if(!wonderNames.includes(d.settings.wonder))d.settings.wonder='아부심벨';d.settings.wLv=clamp(parseInt(d.settings.wLv)||0,0,50);d.settings.baseH=Math.max(0,num(d.settings.baseH,0));d.settings.sleepPrepH=d.settings.sleepPrepH===''||d.settings.sleepPrepH===null||d.settings.sleepPrepH===undefined?'':Math.max(0,num(d.settings.sleepPrepH,0));if(!['최장','30분','1시간','2시간'].includes(d.settings.sleepCycle))d.settings.sleepCycle='최장';d.settings.sleepCount=Math.max(0,Math.floor(num(d.settings.sleepCount,3)));if(obj?.settings?.productRawCycleVersion!==1||!['생산 계산기값','30분','1시간','2시간'].includes(d.settings.productRawCycle))d.settings.productRawCycle='생산 계산기값';d.settings.productRawCycleVersion=1;
   d.wonder.cur=clamp(parseInt(d.wonder.cur)||0,0,50);d.wonder.tgt=Math.max(d.wonder.cur,clamp(parseInt(d.wonder.tgt)||0,0,50));
   for(const n of resourceOrder){const s=d.resources[n];s.lv=clamp(parseInt(s.lv)||1,1,6);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
   for(const n of productOrder){const s=d.products[n];s.lv=closestProductLevel(n,s.lv);s.mode=closestModeForLevel(n,s.lv,s.mode);s.bldgs=Math.max(0,num(s.bldgs,0));s.irrigation=normalizedHappiness(s.irrigation,100);s.stock=Math.round(num(s.stock,0));s.hours=normalizedDetailHours(s.hours)}
@@ -1262,7 +1276,7 @@ document.getElementById('baseH').addEventListener('change',e=>{app.settings.base
 document.getElementById('sleepPrepH').addEventListener('change',e=>{const v=e.target.value.trim();app.settings.sleepPrepH=v===''?'':Math.max(0,num(v,0));e.target.value=app.settings.sleepPrepH;renderSleepReserve();saveState();postSize()})
 document.getElementById('sleepCycle').addEventListener('change',e=>{app.settings.sleepCycle=e.target.value;renderSleepReserve();saveState();postSize()})
 document.getElementById('sleepCount').addEventListener('change',e=>{app.settings.sleepCount=Math.max(0,Math.floor(num(e.target.value,3)));e.target.value=app.settings.sleepCount;renderSleepReserve();saveState();postSize()})
-document.getElementById('productRawCycle').addEventListener('change',e=>{app.settings.productRawCycle=['30분','1시간','2시간'].includes(e.target.value)?e.target.value:'30분';e.target.value=app.settings.productRawCycle;renderAdjustment();saveState();postSize()})
+document.getElementById('productRawCycle').addEventListener('change',e=>{app.settings.productRawCycle=['생산 계산기값','30분','1시간','2시간'].includes(e.target.value)?e.target.value:'생산 계산기값';e.target.value=app.settings.productRawCycle;renderAdjustment();saveState();postSize()})
 document.getElementById('curLv').addEventListener('change',e=>{app.wonder.cur=clamp(parseInt(e.target.value)||0,0,50);if(app.wonder.tgt<app.wonder.cur)app.wonder.tgt=app.wonder.cur;e.target.value=app.wonder.cur;document.getElementById('tgtLv').value=app.wonder.tgt;renderWonder();renderAdjustment();saveState()})
 document.getElementById('tgtLv').addEventListener('change',e=>{app.wonder.tgt=Math.max(app.wonder.cur,clamp(parseInt(e.target.value)||0,0,50));e.target.value=app.wonder.tgt;renderWonder();renderAdjustment();saveState()})
 document.getElementById('saveDefaultBtn').addEventListener('click',saveUserDefault)
@@ -1448,7 +1462,7 @@ function labelTables(){
   t.querySelectorAll('thead th').forEach((th,i)=>{th.dataset.label=headers[i];const tip=TOOLTIPS[headers[i]];if(tip&&!th.querySelector('.info-tip'))th.innerHTML=safeText(headers[i])+' '+helpButton(headers[i],tip);});
   for(const row of t.querySelectorAll('tbody tr'))[...row.cells].forEach((td,i)=>{td.dataset.label=headers[i]||'';td.querySelector(':scope > .mobilelabel')?.remove();if(i&&t.id!=='tConvert'){const span=document.createElement('span');span.className='mobilelabel';span.textContent=headers[i]||'';td.prepend(span);}td.querySelectorAll('input,select').forEach(el=>el.setAttribute('aria-label',(row.dataset.name||row.cells[0]?.querySelector('select')?.selectedOptions[0]?.textContent||row.cells[0]?.textContent||'항목')+' '+headers[i]));});
  }
- const inputHelp={bonusLv:'현재 적용받는 불가사의 보너스 레벨입니다.',baseH:'운영 시간을 따로 입력하지 않은 항목에 공통으로 적용됩니다.',sleepPrepH:'취침 전까지 남은 시간입니다. 건물별 운영 시간과 이 시간 중 짧은 시간을 적용하며, 비우면 기본 운영 시간을 사용합니다.',sleepCycle:'취침 전에 예약할 주기입니다. 해당 레벨에 없는 주기는 가장 긴 생산 주기로 적용합니다.',sleepCount:'건물 1채당 예약할 생산 횟수입니다. 모든 횟수에 필요한 원료를 취침 전까지 확보해야 합니다.',productRawCycle:'목표 상품 부족분의 원료량을 환산할 기준 주기입니다. Lv6·행복도 100% 기준이며 현재 생산 설정은 바꾸지 않습니다.'};
+ const inputHelp={bonusLv:'현재 적용받는 불가사의 보너스 레벨입니다.',baseH:'운영 시간을 따로 입력하지 않은 항목에 공통으로 적용됩니다.',sleepPrepH:'취침 전까지 남은 시간입니다. 건물별 운영 시간과 이 시간 중 짧은 시간을 적용하며, 비우면 기본 운영 시간을 사용합니다.',sleepCycle:'취침 전에 예약할 주기입니다. 해당 레벨에 없는 주기는 가장 긴 생산 주기로 적용합니다.',sleepCount:'건물 1채당 예약할 생산 횟수입니다. 모든 횟수에 필요한 원료를 취침 전까지 확보해야 합니다.',productRawCycle:'목표 상품 부족분을 Lv6·행복도 100% 기준으로 환산합니다. 생산 계산기값은 상품별 설정 주기를 따릅니다. 상세 설정은 건물 수·운영 시간·기준 생산량 비중으로 반영하며, 운영 시간이 모두 0이면 건물 수·기준 생산량 비중을 사용합니다. Lv6에 없는 주기는 가장 가까운 주기를 사용합니다.'};
  for(const [id,tip]of Object.entries(inputHelp)){const input=$(id),label=input?.closest('label');if(label&&!label.querySelector('.info-tip'))input.insertAdjacentHTML('beforebegin',' '+helpButton(label.firstChild.textContent.trim(),tip)+' ');}
 }
 function prepareAmountInputs(){document.querySelectorAll('input[data-k="stock"],#debenStock,#debenRate').forEach(el=>{const exact=el.value;el.type='text';el.classList.add('amount-input');el.dataset.exact=exact;el.dataset.allowEmpty=String(el.id==='debenRate');el.value=exact===''?'':fmtAmount(Number(exact));el.inputMode='text';el.title=exact===''?'비워 두면 자동 계산':'정확한 수량: '+exactAmountText(Number(exact));});}
