@@ -25,7 +25,8 @@ function shapeDigit(kind,rows,guess){
  }
  if(kind==='dark'&&(guess==='0'||guess==='6')){
   const bridge=region(.38,.57,.43,.67);
-  if(bridge.rowsHit>=2)return '6';
+  // A round zero's antialiased side can enter the center at low thresholds.
+  // Preserve the template's zero; only remove a six when its bridge is absent.
   if(bridge.hit===0)return '0';
  }
  return guess;
