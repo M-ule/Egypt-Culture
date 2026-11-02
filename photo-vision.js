@@ -21,7 +21,7 @@ function shapeDigit(kind,rows,guess){
  if(kind==='light'&&(guess==='5'||guess==='6')){
   const lower=region(.67,.88,0,.34),lines=Math.ceil(h*.88)-Math.floor(h*.67);
   if(lower.rowsHit>=Math.max(2,Math.ceil(lines*.65)))return '6';
-  if(lower.rowsHit<=Math.floor(lines*.30))return '5';
+  if(lower.rowsHit<=Math.floor(lines*.50))return '5';
  }
  if(kind==='dark'&&(guess==='0'||guess==='6')){
   const bridge=region(.38,.57,.35,.68);
