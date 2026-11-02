@@ -13,6 +13,23 @@ function locate(map,pattern){const rows=pattern.rows,w=rows[0].length,h=rows.len
 function trim(rows){while(rows.length&&!rows[0].includes('1'))rows.shift();while(rows.length&&!rows.at(-1).includes('1'))rows.pop();if(!rows.length)return [];let lo=rows[0].length,hi=0;for(const r of rows)for(let x=0;x<r.length;x++)if(r[x]==='1'){lo=Math.min(lo,x);hi=Math.max(hi,x);}return rows.map(r=>r.slice(lo,hi+1));}
 function glyphScore(a,b){a=trim(a);b=trim(b);if(!a.length||!b.length)return 0;const w=12,h=22;let same=0,total=0;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const aa=a[Math.floor(y*a.length/h)][Math.floor(x*a[0].length/w)]==='1',bb=b[Math.floor(y*b.length/h)][Math.floor(x*b[0].length/w)]==='1';if(aa&&bb)same++;if(aa||bb)total++;}return same/Math.max(1,total);}
 function sharedScore(rows,reference){rows=trim(rows);if(!rows.length)return 0;const w=20,h=32,scale=Math.min(18/rows[0].length,30/rows.length),rw=rows[0].length*scale,rh=rows.length*scale,left=(w-rw)/2,top=(h-rh)/2;let both=0,total=0;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const sx=Math.floor((x-left)/scale),sy=Math.floor((y-top)/scale),a=sx>=0&&sx<rows[0].length&&sy>=0&&sy<rows.length&&rows[sy][sx]==='1',b=reference[y][x]==='1';if(a&&b)both++;if(a||b)total++;}return both/Math.max(1,total);}
+// Distinguish the nearly identical 5/6 level glyphs and 0/6 inventory glyphs
+// using their strokes, not the most frequent (sometimes wrong) font template.
+function shapeDigit(kind,rows,guess){
+ const a=trim(rows),h=a.length,w=a[0]?.length||0;if(h<9||w<5)return guess;
+ const region=(y1,y2,x1,x2)=>{let hit=0,rowsHit=0;for(let y=Math.floor(h*y1);y<Math.ceil(h*y2)&&y<h;y++){let rowHit=0;for(let x=Math.floor(w*x1);x<Math.ceil(w*x2)&&x<w;x++)rowHit+=a[y][x]==='1';if(rowHit)rowsHit++;hit+=rowHit;}return {hit,rowsHit};};
+ if(kind==='light'&&(guess==='5'||guess==='6')){
+  const lower=region(.67,.88,0,.34),lines=Math.ceil(h*.88)-Math.floor(h*.67);
+  if(lower.rowsHit>=Math.max(2,Math.ceil(lines*.65)))return '6';
+  if(lower.rowsHit<=Math.floor(lines*.30))return '5';
+ }
+ if(kind==='dark'&&(guess==='0'||guess==='6')){
+  const bridge=region(.38,.57,.35,.68);
+  if(bridge.rowsHit>=2)return '6';
+  if(bridge.hit===0)return '0';
+ }
+ return guess;
+}
 function consensus(readings){const votes=new Map();for(const r of readings)if(r?.value!==null&&r?.value!==undefined)votes.set(r.value,(votes.get(r.value)||0)+1);const ranked=[...votes].sort((a,b)=>b[1]-a[1]);return {value:ranked.length&&(ranked[0][1]>=2||ranked.length===1)?ranked[0][0]:null,candidates:ranked.map(r=>r[0]),needsReview:ranked.length!==1||ranked[0][1]<2};}
 const masks=new WeakMap();function thresholdMap(image,kind,t){let cache=masks.get(image);if(!cache){cache=new Map();masks.set(image,cache);}const key=kind+'_'+t;if(!cache.has(key))cache.set(key,bitmap(image,kind,t));return cache.get(key);}
 function readNumber(image,box,kind){return consensus((kind==='light'?[165,180,195]:kind==='top'?[85,95,110]:[155,175,195]).map(t=>digits(thresholdMap(image,kind,t),box,kind)));}
@@ -21,7 +38,7 @@ function digits(map,box,kind,skipFirst=false){const x0=Math.max(0,Math.floor(box
  let text='',confidence=1;for(const [a,b]of (skipFirst?runs.slice(1):runs)){const rows=[];for(let y=0;y<h;y++){let row='';for(let x=a;x<b;x++)row+=map.bits[(y0+y)*map.w+x0+x];rows.push(row);}const tight=trim(rows);if(!tight.length)continue;if(tight.length<8){if(kind==='top'&&tight.length<=3&&b-a<=4)text+='.';continue;}const native=new Map();for(const g of patterns.glyphs.filter(g=>g.kind===kind))native.set(g.text,Math.max(native.get(g.text)||0,glyphScore(tight,g.rows)));const ranked=[...native].map(([text,score])=>({text,score})).sort((a,b)=>b.score-a.score);
  let chosen=ranked[0],margin=(chosen?.score||0)-(ranked[1]?.score||0);
  if(!chosen||chosen.score<.85||margin<.08){const generic=Object.entries(window.EgyptSharedDigits||{}).map(([text,variants])=>({text,score:Math.max(...variants.map(rows=>sharedScore(tight,rows)))})).sort((a,b)=>b.score-a.score);if(generic[0]?.score>=.80&&generic[0].score-(generic[1]?.score||0)>=.08){chosen=generic[0];margin=generic[0].score-(generic[1]?.score||0);}}
- if(!chosen||chosen.score<.60||margin<.05)return null;text+=chosen.text;confidence=Math.min(confidence,chosen.score);}
+ if(!chosen||chosen.score<.60||margin<.05)return null;text+=shapeDigit(kind,tight,chosen.text);confidence=Math.min(confidence,chosen.score);}
 
  const match=text.match(/^(\d+(?:\.\d+)?)([KM])?$/);if(!match)return null;return {value:Number(match[1])*(match[2]==='K'?1000:match[2]==='M'?1000000:1),confidence};
 }
