@@ -25,7 +25,7 @@ const load = () => new Function(runtime + `
  productOrder,resourceOrder,productOutput,productTargetNeed,resourceTargetNeed,
  productAdjustment,resourceAdjustment,wonderTime,sleepResourcePower,configs,configHours,
  infoProduct,infoResource,happyCycleOutput,productBenchmarkRate,productLevels,modesForProduct,
- cyclicOutput,CITY_VARIANTS,normalizeCity,cityGroups};`)();
+ cyclicOutput,CITY_VARIANTS,normalizeCity,cityGroups,maxReachResourceLevel,targetRawRequirementTo,WONDER};`)();
 function near(actual, expected) { assert(Math.abs(actual - expected) <= 1e-7 * Math.max(1, Math.abs(expected)), `${actual} != ${expected}`); }
 
 test('resource completion respects stops, stock, zero time, and unavailable targets', () => {
@@ -126,4 +126,79 @@ test('photo level groups survive reload and drive city totals', () => {
  assert.deepEqual(a.cityGroups(channel).map(g=>g.n),[4,1]);assert.strictEqual(a.cityGroups(channel)[1].l,channel.levels[3]);
  assert.doesNotThrow(()=>a.cityStats());
  const restored=a.normalizeCity(JSON.parse(JSON.stringify(a.state.city)));assert.deepEqual(restored.photoGroups.Irrigation_Channel,[{lv:2,count:4},{lv:3,count:1}]);
+});
+
+
+test('maximum reachable level respects both resources, owned goods and exact cumulative boundaries', () => {
+  const a=load();a.reset();
+  assert.equal(a.maxReachResourceLevel(),1);
+  a.state.wonder.cur=0;
+  assert.equal(a.maxReachResourceLevel(),0);
+  a.state.wonder.cur=1;
+  a.state.settings.productRawCycle='30분';
+  // Independent requirements: sum each level, deduct each owned good once,
+  // then convert only that shortage with its Lv6 recipe.
+  const cost=(raw,target)=>a.productOrder.reduce((sum,n)=>{
+    let need=0;for(let lv=a.state.wonder.cur+1;lv<=target;lv++)need+=a.WONDER[lv]?.[n]||0;
+    const p=a.infoProduct(n,6,'30분');
+    return sum+(p.raw===raw?Math.max(0,need-a.state.products[n].stock)*p.rawUse/a.happyCycleOutput(p,100):0);
+  },0);
+  for(const target of [2,7,20,49,50]){
+    for(const raw of a.resourceOrder)a.state.resources[raw].stock=cost(raw,target);
+    assert.equal(a.maxReachResourceLevel(),target);
+    for(const raw of a.resourceOrder){
+      const exact=a.state.resources[raw].stock;
+      a.state.resources[raw].stock=exact-0.001;
+      assert(a.maxReachResourceLevel()<target,raw+' shortfall must limit level');
+      a.state.resources[raw].stock=exact;
+    }
+  }
+  for(const n of a.productOrder)a.state.products[n].stock=1e12;
+  for(const raw of a.resourceOrder)a.state.resources[raw].stock=0;
+  assert.equal(a.maxReachResourceLevel(),50);
+  a.state.wonder.cur=50;
+  assert.equal(a.maxReachResourceLevel(),50);
+});
+
+test('reach adds actual resource schedules and bonuses without double counting planned goods', () => {
+  const a=load();a.reset();a.state.settings.baseH=10;
+  a.state.settings.productRawCycle='30분';
+  for(const raw of a.resourceOrder){
+    a.state.resourceDetails[raw]={enabled:true,rows:[{lv:6,count:2,irrigation:51,hours:1},{lv:3,count:0.5,irrigation:100,hours:7}]};
+  }
+  for(const wonder of ['아부심벨','쿠푸왕의 피라미드','대스핑크스','호루스의 신전']){
+    a.state.settings.wonder=wonder;a.state.settings.wLv=30;
+    const expected=a.maxReachResourceLevel();
+    const production=Object.fromEntries(a.resourceOrder.map(n=>[n,a.resourceOutput(n)]));
+    for(const n of a.resourceOrder){a.state.resourceDetails[n].enabled=false;a.state.resources[n].bldgs=0;a.state.resources[n].stock=production[n];}
+    assert.equal(a.maxReachResourceLevel(),expected);
+    for(const n of a.resourceOrder){a.state.resourceDetails[n].enabled=true;a.state.resources[n].stock=0;}
+  }
+  const baseline=a.maxReachResourceLevel();
+  for(const n of a.productOrder)Object.assign(a.state.products[n],{lv:6,bldgs:1e6,hours:1000});
+  assert.equal(a.maxReachResourceLevel(),baseline,'excess product plans neither spend nor create raw budget');
+  a.state.wonder.tgt=50;
+  assert.equal(a.maxReachResourceLevel(),baseline,'selected goal does not change maximum');
+  a.state.wonder.tgt=1;
+  assert.equal(a.maxReachResourceLevel(),baseline);
+});
+
+test('reach follows reference cycle including mixed per-product cycle inheritance', () => {
+  const a=load();a.reset();
+  a.state.settings.productRawCycle='생산 계산기값';
+  for(const n of a.productOrder)a.state.products[n].mode='30분';
+  a.state.products['예복'].mode='2시간';
+  const raw='파피루스',target=10;
+  const expected=a.productOrder.reduce((sum,n)=>{
+    const p=a.infoProduct(n,6,a.state.products[n].mode);
+    let need=0;for(let lv=2;lv<=target;lv++)need+=a.WONDER[lv]?.[n]||0;
+    return sum+(p.raw===raw?need*p.rawUse/a.happyCycleOutput(p,100):0);
+  },0);
+  near(a.targetRawRequirementTo(raw,target),expected);
+  a.state.settings.productRawCycle='2시간';
+  assert(a.targetRawRequirementTo(raw,target)<expected);
+  for(const raw of a.resourceOrder)a.state.resources[raw].stock=a.targetRawRequirementTo(raw,target);
+  assert.equal(a.maxReachResourceLevel(),target);
+  a.state.settings.productRawCycle='생산 계산기값';
+  assert(a.maxReachResourceLevel()<target);
 });

@@ -697,7 +697,7 @@ button.info-tip:focus-visible{box-shadow:0 0 0 2px #f4dbb9}
 
 /* Named summaries and a single mobile label per field, matching Viking. */
 #bonusSummary{grid-template-columns:repeat(2,minmax(0,1fr))}
-#goalSummary{grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)}
+#goalSummary{grid-template-columns:minmax(0,1fr) minmax(0,3fr)}
 #bonusSummary .metric,#goalSummary .metric{height:auto;min-height:90px}
 #bonusSummary .metric strong.bad,#goalSummary .metric strong.bad{color:var(--red)}
 #bonusSummary .metric strong,#goalSummary .metric strong{font-size:17px!important;line-height:1.55!important;word-break:keep-all}
@@ -1183,6 +1183,31 @@ function targetRawRequirement(raw){
   }
   return total
 }
+// Each candidate spends resources only on its own missing products.
+// Planned product output is not added: its raw materials are still in this budget.
+function targetRawRequirementTo(raw,target){
+  let total=0;
+  for(const name of productOrder){
+    let need=0;
+    for(let lv=app.wonder.cur+1;lv<=target;lv++)need+=num(WONDER[String(lv)]?.[name],0);
+    const amount=Math.max(0,need-num(app.products[name].stock,0));
+    const cost=rawRequirementForAmount(name,raw,amount);
+    if(cost===null)return null;
+    total+=cost;
+  }
+  return total;
+}
+function maxReachResourceLevel(){
+  const cur=clamp(parseInt(app.wonder.cur)||0,0,50);
+  const available=Object.fromEntries(resourceOrder.map(raw=>[raw,Math.max(0,num(app.resources[raw].stock,0))+resourceOutput(raw)]));
+  for(let target=50;target>cur;target--){
+    if(resourceOrder.every(raw=>{
+      const need=targetRawRequirementTo(raw,target);
+      return need!==null&&need<=available[raw]+1e-8;
+    }))return target;
+  }
+  return cur;
+}
 function resourceTargetNeed(name){
   const total=targetRawRequirement(name);if(total===null)return null;
   return Math.max(0,total-num(app.resources[name].stock,0))
@@ -1301,7 +1326,7 @@ document.getElementById('baseH').addEventListener('change',e=>{app.settings.base
 document.getElementById('sleepPrepH').addEventListener('change',e=>{const v=e.target.value.trim();app.settings.sleepPrepH=v===''?'':Math.max(0,num(v,0));e.target.value=app.settings.sleepPrepH;renderSleepReserve();saveState();postSize()})
 document.getElementById('sleepCycle').addEventListener('change',e=>{app.settings.sleepCycle=e.target.value;renderSleepReserve();saveState();postSize()})
 document.getElementById('sleepCount').addEventListener('change',e=>{app.settings.sleepCount=Math.max(0,Math.floor(num(e.target.value,3)));e.target.value=app.settings.sleepCount;renderSleepReserve();saveState();postSize()})
-document.getElementById('productRawCycle').addEventListener('change',e=>{app.settings.productRawCycle=['생산 계산기값','30분','1시간','2시간'].includes(e.target.value)?e.target.value:'생산 계산기값';e.target.value=app.settings.productRawCycle;renderAdjustment();saveState();postSize()})
+document.getElementById('productRawCycle').addEventListener('change',e=>{app.settings.productRawCycle=['생산 계산기값','30분','1시간','2시간'].includes(e.target.value)?e.target.value:'생산 계산기값';e.target.value=app.settings.productRawCycle;renderWonder();renderAdjustment();saveState();postSize()})
 document.getElementById('curLv').addEventListener('change',e=>{app.wonder.cur=clamp(parseInt(e.target.value)||0,0,50);if(app.wonder.tgt<app.wonder.cur)app.wonder.tgt=app.wonder.cur;e.target.value=app.wonder.cur;document.getElementById('tgtLv').value=app.wonder.tgt;renderWonder();renderAdjustment();saveState()})
 document.getElementById('tgtLv').addEventListener('change',e=>{app.wonder.tgt=Math.max(app.wonder.cur,clamp(parseInt(e.target.value)||0,0,50));e.target.value=app.wonder.tgt;renderWonder();renderAdjustment();saveState()})
 document.getElementById('saveDefaultBtn').addEventListener('click',saveUserDefault)
@@ -1442,7 +1467,7 @@ wonderTime=function(name){
  return hi;
 };
 function duration(h){if(h===null||!Number.isFinite(h))return '생산 설정 확인';const m=Math.ceil(Math.max(0,h)*60-1e-7);return m>=60?Math.floor(m/60)+'시간'+(m%60?' '+m%60+'분':''):m+'분';}
-function metric(k,v,state=''){return '<div class="metric"><span>'+safeText(k)+'</span><strong class="'+safeText(state)+'">'+v+'</strong></div>';}
+function metric(k,v,state='',tip=''){return '<div class="metric"><span>'+safeText(k)+(tip?' '+helpButton(k,tip):'')+'</span><strong class="'+safeText(state)+'">'+v+'</strong></div>';}
 const TOOLTIPS={"행복도(%)": "이집트의 관개 효과를 0~100%로 입력하세요. 원료 사용량에는 영향을 주지 않습니다.", "레벨": "생산 건물의 현재 레벨을 입력합니다.", "생산 방식": "자원은 연속 생산하며, 상품은 완료한 생산 주기만 계산합니다.", "운영 시간(h)": "비워 두면 항목별 시간, 기본 운영 시간 순으로 적용합니다. 0은 생산하지 않습니다.", "현재 보유량": "현재 가진 수량입니다. K, M 단위로 입력할 수 있습니다.", "예상 생산량": "현재 입력한 건물 구성과 운영 시간을 기준으로 예상되는 생산량입니다.", "잔여/부족": "현재 보유량 + 예상 생산량 − 소비량입니다. 양수는 잔여량, 음수는 부족량입니다.", "소요 시간(h)": "입력한 운영 시간 안에 부족한 원료를 확보하는 시간입니다. 확보할 수 없으면 —로 표시합니다.", "생산력 차이": "현재 생산력 − 필요 생산력입니다. 0 이상이면 충분하고, 음수이면 부족합니다.", "현재 생산력": "목표 레벨에서는 가장 긴 건물 운영 시간 동안 각 건물이 실제 생산한 양을 환산합니다. 수면 영역은 취침 전 시간으로 환산합니다.", "필요 생산력": "목표까지 부족한 양을 현재 생산력과 동일한 비교 시간 안에 생산하기 위한 생산력입니다.", "화폐 사용량": "상품 생산에 사용하는 데벤입니다. 도시 관리의 데벤 잔액에서도 차감합니다.", "필요량": "입력한 상품 생산 계획에 필요한 원료량입니다.", "상세 설정": "건물마다 레벨·생산 방식·행복도·운영 시간이 다를 때 각각 나누어 입력합니다.", "목표 완료 시간(h)": "현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성과 원료 부족 대기 시간은 제외합니다.", "건물 수": "해당 생산에 사용하는 건물 수입니다. 0.5채는 1채의 생산량·소비량·일꾼·면적을 절반으로 계산합니다.", "구간 필요량": "현재 레벨 다음부터 목표 레벨까지 불가사의가 요구하는 상품량입니다."};
 TOOLTIPS['소요 시간']='현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성과 원료 부족 대기 시간은 제외합니다. 생산할 수 있는 건물이 없으면 —로 표시합니다.';
 TOOLTIPS['데벤 사용량']=TOOLTIPS['화폐 사용량'];
@@ -1513,8 +1538,7 @@ renderWonder=function(){
  const rows=[...resourceOrder.map(resourceAdjustment),...productOrder.map(productAdjustment)];
  const short=rows.filter(r=>r.diff!==null&&r.diff<-1e-8).map(r=>r.name);
  const unknown=rows.filter(r=>r.diff===null).map(r=>r.name);
- const times=productOrder.map(wonderTime);
- $('goalSummary').innerHTML=metric('목표 레벨','Lv.'+app.wonder.tgt)+metric('생산력 부족 항목',(short.length?short.map(n=>safeText(displayName(n))).join(' · '):unknown.length?'':'없음')+(unknown.length?(short.length?'<br>':'')+'운영 시간 확인: '+unknown.map(n=>safeText(displayName(n))).join(' · '):''),short.length||unknown.length?'bad':'')+metric('목표 완료 시간',times.some(x=>x===null)?'생산 설정 확인':duration(Math.max(...times)));
+ $('goalSummary').innerHTML=metric('최대 도달(자원 기준)','Lv.'+maxReachResourceLevel(),'','보유 상품과 보유·예상 생산 파피루스·금을 기준으로 최대 도달 레벨을 계산합니다. 각 레벨에 부족한 상품만 필요량 환산 기준 주기의 Lv6·행복도 100%로 환산합니다. 초과 생산 소비와 상품 생산 시간, 데벤·일꾼 제한은 고려하지 않습니다.')+metric('생산력 부족 항목',(short.length?short.map(n=>safeText(displayName(n))).join(' · '):unknown.length?'':'없음')+(unknown.length?(short.length?'<br>':'')+'운영 시간 확인: '+unknown.map(n=>safeText(displayName(n))).join(' · '):''),short.length||unknown.length?'bad':'');
 };
 const oldRenderSleep=renderSleepReserve;
 renderSleepReserve=function(){oldRenderSleep();$('sleepActual').textContent='실제 예약 주기: '+productOrder.map(n=>{const ls=[...new Set(configs('products',n).filter(r=>r.count>0).map(r=>sleepRecipe(n,r.lv)?.mode).filter(Boolean))];return n+' '+(ls.join('·')||'건물 없음');}).join(' / ');};
