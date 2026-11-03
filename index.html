@@ -833,7 +833,7 @@ button.detail-badge:hover{background:#eee2b3}
     <th>자원</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>잔여/부족</th><th>예상 생산량</th><th>필요량</th><th>소요 시간</th>
   </tr></thead><tbody></tbody></table></div></div><div class="card" id="stage2"><div class="sectionbar"><div class="production-section-title"><h2>상품 <button type="button" class="info-tip" data-tip="완료한 생산 주기를 기준으로 생산량과 데벤·원료 사용량을 계산합니다." aria-label="상품 설명">i</button></h2><span id="productDetailSummary" class="muted"></span></div><button id="productDetailOpen">상품 상세 설정</button></div><div class="wrap"><table class="prodtable" id="tProduct"><thead><tr>
     <th>상품</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>예상 생산량</th><th>데벤 사용량</th><th>파피루스 사용량</th><th>금 사용량</th>
-  </tr></thead><tbody></tbody></table></div></div></div></section><section id="panel-wonder" class="panel"><nav class="mobile-section-nav" aria-label="불가사의 목표 섹션 바로가기"><a href="#goalCard">목표 현황</a><a href="#sleepCard">수면</a><a href="#powerCard">생산력</a><a href="#conversionCard">환산표</a></nav><div class="card" id="wonderSettings"><div class="sectionbar"><h2>불가사의 목표 <button type="button" class="info-tip" data-tip="현재 레벨 다음부터 목표 레벨까지 필요한 상품량을 계산합니다." aria-label="불가사의 목표 설명">i</button></h2><button id="wonderView" type="button">상세 보기</button></div><div class="bar"><label>현재 레벨<input id="curLv" type="number" min="0" max="50"></label><label>목표 레벨<input id="tgtLv" type="number" min="0" max="50"></label><span id="wonderContext" class="wonder-context"></span><span id="wonderBaseHDisplay" hidden></span></div><div id="goalSummary" class="summary"></div></div><div class="card" id="goalCard"><div class="sectionbar"><h2>목표 달성 현황 <button type="button" class="info-tip" data-tip="잔여/부족은 입력한 운영 시간 기준입니다. 소요 시간은 현재 생산 설정으로 목표량을 확보할 때까지 계산하며, 원료·일꾼이 충분하다고 가정합니다. 운영 시간이 0인 구성은 제외합니다." aria-label="목표 달성 현황 설명">i</button></h2></div><div id="goalTable"><div class="wrap"><table class="result-table" id="tGoal"><thead><tr>
+  </tr></thead><tbody></tbody></table></div></div></div></section><section id="panel-wonder" class="panel"><nav class="mobile-section-nav" aria-label="불가사의 목표 섹션 바로가기"><a href="#goalCard">목표 현황</a><a href="#sleepCard">수면</a><a href="#powerCard">생산력</a><a href="#conversionCard">환산표</a></nav><div class="card" id="wonderSettings"><div class="sectionbar"><h2>불가사의 목표 <button type="button" class="info-tip" data-tip="현재 레벨 다음부터 목표 레벨까지 필요한 상품량을 계산합니다." aria-label="불가사의 목표 설명">i</button></h2><button id="wonderView" type="button">상세 보기</button></div><div class="bar"><label>현재 레벨<input id="curLv" type="number" min="0" max="50"></label><label>목표 레벨<input id="tgtLv" type="number" min="0" max="50"></label><span id="wonderContext" class="wonder-context"></span><span id="wonderBaseHDisplay" hidden></span></div><div id="goalSummary" class="summary"></div></div><div class="card" id="goalCard"><div class="sectionbar"><h2>목표 달성 현황 <button type="button" class="info-tip" data-tip="잔여/부족은 입력한 운영 시간 기준입니다. 소요 시간은 현재 생산 설정으로 목표량을 확보할 때까지 계산하며, 원료·일꾼이 충분하다고 가정합니다. 운영 시간과 관계없이 설정한 건물 구성을 사용합니다." aria-label="목표 달성 현황 설명">i</button></h2></div><div id="goalTable"><div class="wrap"><table class="result-table" id="tGoal"><thead><tr>
     <th>상품</th><th>잔여/부족</th><th>구간 필요량</th><th>현재 보유량</th><th>예상 생산량</th><th>예상 보유량</th><th>소요 시간</th>
   </tr></thead><tbody></tbody></table></div></div></div><div class="card" id="sleepCard"><div class="sectionbar"><h2>수면 대비 자원 확보 <button type="button" class="info-tip" data-tip="취침 전까지 예약 생산에 필요한 원료를 확보할 수 있는지 확인합니다. 현재 보유량과 취침 전 생산·소비를 반영하며, 수면 중 자원 생산량은 포함하지 않습니다." data-help-extra="sleepActual" aria-label="수면 대비 자원 확보 설명">i</button></h2></div><div class="bar"><label>수면까지 남은 시간(h)<input id="sleepPrepH" type="number" min="0" step="any" placeholder="기본"></label><label>수면 중 생산 주기<select id="sleepCycle"><option value="최장">레벨별 최장</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
     </label><label>생산 횟수<input id="sleepCount" type="number" min="0"></label></div><div id="sleepActual" class="note" hidden></div><div id="sleepTable"><div class="wrap"><table class="result-table" id="tSleep"><thead><tr>
@@ -1530,10 +1530,10 @@ resourceCurrentPower=function(name){const h=productionWindow('resources',name);r
 productRequiredPower=function(name){return requiredPowerFromAmount(productTargetNeed(name),productionWindow('products',name),productBenchmarkRate(name));};
 resourceRequiredPower=function(name){const n=resourceTargetNeed(name);return n===null?null:requiredPowerFromAmount(n,productionWindow('resources',name),resourceBenchmarkRate(name));};
 // Reference raw needs use proportional building allocation; actual production still counts completed cycles.
-// Completion time extends active production settings beyond the planned operating window.
+// Completion time uses configured buildings regardless of the planned operating window, including zero hours.
 wonderTime=function(name){
  const need=productTargetNeed(name);if(need<=0)return 0;
- const rows=configs('products',name).filter(r=>configHours('products',name,r)>0&&r.count>0).map(r=>{
+ const rows=configs('products',name).filter(r=>r.count>0).map(r=>{
   const p=infoProduct(name,r.lv,r.mode);
   return {...r,p,perCycle:p?happyCycleOutput(p,r.irrigation)*r.count:0};
  }).filter(r=>r.p&&r.p.min>0&&r.perCycle>0);
@@ -1546,8 +1546,8 @@ wonderTime=function(name){
 };
 function duration(h){if(h===null||!Number.isFinite(h))return '생산 설정 확인';const m=Math.ceil(Math.max(0,h)*60-1e-7);return m>=60?Math.floor(m/60)+'시간'+(m%60?' '+m%60+'분':''):m+'분';}
 function metric(k,v,state='',tip=''){return '<div class="metric"><span>'+safeText(k)+(tip?' '+helpButton(k,tip):'')+'</span><strong class="'+safeText(state)+'">'+v+'</strong></div>';}
-const TOOLTIPS={"행복도(%)": "이집트의 관개 효과를 0~100%로 입력하세요. 원료 사용량에는 영향을 주지 않습니다.", "레벨": "생산 건물의 현재 레벨을 입력합니다.", "생산 방식": "자원은 연속 생산하며, 상품은 완료한 생산 주기만 계산합니다.", "운영 시간(h)": "비워 두면 항목별 시간, 기본 운영 시간 순으로 적용합니다. 0은 생산하지 않습니다.", "현재 보유량": "현재 가진 수량입니다. K, M 단위로 입력할 수 있습니다.", "예상 생산량": "현재 입력한 건물 구성과 운영 시간을 기준으로 예상되는 생산량입니다.", "잔여/부족": "현재 보유량 + 예상 생산량 − 소비량입니다. 양수는 잔여량, 음수는 부족량입니다.", "소요 시간(h)": "입력한 운영 시간 안에 부족한 원료를 확보하는 시간입니다. 확보할 수 없으면 —로 표시합니다.", "생산력 차이": "현재 생산력 − 필요 생산력입니다. 0 이상이면 충분하고, 음수이면 부족합니다.", "현재 생산력": "목표 레벨에서는 가장 긴 건물 운영 시간 동안 각 건물이 실제 생산한 양을 환산합니다. 수면 영역은 취침 전 시간으로 환산합니다.", "필요 생산력": "목표까지 부족한 양을 현재 생산력과 동일한 비교 시간 안에 생산하기 위한 생산력입니다.", "화폐 사용량": "상품 생산에 사용하는 데벤입니다. 도시 관리의 데벤 잔액에서도 차감합니다.", "필요량": "입력한 상품 생산 계획에 필요한 원료량입니다.", "상세 설정": "건물마다 레벨·생산 방식·행복도·운영 시간이 다를 때 각각 나누어 입력합니다.", "목표 완료 시간(h)": "현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성과 원료 부족 대기 시간은 제외합니다.", "건물 수": "해당 생산에 사용하는 건물 수입니다. 0.5채는 1채의 생산량·소비량·일꾼·면적을 절반으로 계산합니다.", "구간 필요량": "현재 레벨 다음부터 목표 레벨까지 불가사의가 요구하는 상품량입니다."};
-TOOLTIPS['소요 시간']='현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성과 원료 부족 대기 시간은 제외합니다. 생산할 수 있는 건물이 없으면 —로 표시합니다.';
+const TOOLTIPS={"행복도(%)": "이집트의 관개 효과를 0~100%로 입력하세요. 원료 사용량에는 영향을 주지 않습니다.", "레벨": "생산 건물의 현재 레벨을 입력합니다.", "생산 방식": "자원은 연속 생산하며, 상품은 완료한 생산 주기만 계산합니다.", "운영 시간(h)": "비워 두면 항목별 시간, 기본 운영 시간 순으로 적용합니다. 0은 생산하지 않습니다.", "현재 보유량": "현재 가진 수량입니다. K, M 단위로 입력할 수 있습니다.", "예상 생산량": "현재 입력한 건물 구성과 운영 시간을 기준으로 예상되는 생산량입니다.", "잔여/부족": "현재 보유량 + 예상 생산량 − 소비량입니다. 양수는 잔여량, 음수는 부족량입니다.", "소요 시간(h)": "현재 건물 구성으로 부족한 원료를 확보하는 시간입니다. 운영 시간을 넘어도 계산하며, 생산 가능한 건물이 없으면 —로 표시합니다.", "생산력 차이": "현재 생산력 − 필요 생산력입니다. 0 이상이면 충분하고, 음수이면 부족합니다.", "현재 생산력": "목표 레벨에서는 가장 긴 건물 운영 시간 동안 각 건물이 실제 생산한 양을 환산합니다. 수면 영역은 취침 전 시간으로 환산합니다.", "필요 생산력": "목표까지 부족한 양을 현재 생산력과 동일한 비교 시간 안에 생산하기 위한 생산력입니다.", "화폐 사용량": "상품 생산에 사용하는 데벤입니다. 도시 관리의 데벤 잔액에서도 차감합니다.", "필요량": "입력한 상품 생산 계획에 필요한 원료량입니다.", "상세 설정": "건물마다 레벨·생산 방식·행복도·운영 시간이 다를 때 각각 나누어 입력합니다.", "목표 완료 시간(h)": "현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성도 포함하며, 원료 부족 대기 시간은 제외합니다.", "건물 수": "해당 생산에 사용하는 건물 수입니다. 0.5채는 1채의 생산량·소비량·일꾼·면적을 절반으로 계산합니다.", "구간 필요량": "현재 레벨 다음부터 목표 레벨까지 불가사의가 요구하는 상품량입니다."};
+TOOLTIPS['소요 시간']='현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성도 포함하며, 원료 부족 대기 시간은 제외합니다. 생산할 수 있는 건물이 없으면 —로 표시합니다.';
 TOOLTIPS['데벤 사용량']=TOOLTIPS['화폐 사용량'];
 TOOLTIPS['평균 행복도(%)']=TOOLTIPS['행복도(%)'];
 function helpButton(label,tip){return '<button type="button" class="info-tip" data-tip="'+safeText(tip)+'" aria-label="'+safeText(label)+' 설명">i</button>';}
@@ -1684,16 +1684,9 @@ function initializeNavigation(){
 }
 
 resourceRequiredHours=function(name,consumption){
- let remaining=Math.max(0,consumption-num(app.resources[name].stock));if(remaining<=0)return 0;
- const rows=configs('resources',name).map(r=>({hours:configHours('resources',name,r),rate:continuousOutput(infoResource(name,r.lv),1,r.count,r.irrigation,resourceWonderMultiplier(name))})).filter(r=>r.hours>0&&r.rate>0);
- const stops=[...new Set(rows.map(r=>r.hours))].sort((a,b)=>a-b);
- let elapsed=0;
- for(const stop of stops){
-  const rate=rows.filter(r=>r.hours>elapsed).reduce((sum,r)=>sum+r.rate,0),available=rate*(stop-elapsed);
-  if(remaining<=available+1e-9)return Math.min(stop,elapsed+remaining/rate);
-  remaining-=available;elapsed=stop;
- }
- return null;
+ const remaining=Math.max(0,consumption-num(app.resources[name].stock));if(remaining<=0)return 0;
+ const rate=configs('resources',name).reduce((sum,r)=>sum+continuousOutput(infoResource(name,r.lv),1,Math.max(0,num(r.count)),r.irrigation,resourceWonderMultiplier(name)),0);
+ return rate>0?remaining/rate:null;
 };
 
 function decorateNumbers(){document.querySelectorAll('input[type="number"]').forEach(input=>{if(input.closest('.step-wrap,.number-step'))return;const wrap=document.createElement('span');wrap.className='number-step';const arrows=document.createElement('span');arrows.className='number-arrows';for(const delta of [1,-1]){const b=document.createElement('button');b.type='button';b.textContent=delta>0?'▲':'▼';b.setAttribute('aria-label',(input.getAttribute('aria-label')||input.closest('label')?.textContent||'숫자')+(delta>0?' 증가':' 감소'));b.onclick=()=>{let value=num(input.value)+delta;if(input.min!=='')value=Math.max(num(input.min),value);if(input.max!=='')value=Math.min(num(input.max),value);input.value=String(value);input.dispatchEvent(new Event('change',{bubbles:true}));};arrows.append(b);}input.replaceWith(wrap);wrap.append(input,arrows);});}

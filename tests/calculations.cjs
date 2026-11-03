@@ -29,27 +29,30 @@ const load = () => new Function(runtime + `
  cyclicOutput,CITY_VARIANTS,normalizeCity,cityGroups,maxReachResourceLevel,targetRawRequirementTo,WONDER};`)();
 function near(actual, expected) { assert(Math.abs(actual - expected) <= 1e-7 * Math.max(1, Math.abs(expected)), `${actual} != ${expected}`); }
 
-test('resource completion respects stops, stock, zero time, and unavailable targets', () => {
-  const a = load();a.reset();
-  const n = '파피루스', rate = a.resourceBenchmarkRate(n);
-  a.state.settings.baseH = 10;
-  a.state.resourceDetails[n] = {enabled:true,rows:[
+test('resource completion ignores planned stops and zero hours, preserves stock and unavailable buildings', () => {
+  const a=load();a.reset();
+  const n='파피루스',rate=a.resourceBenchmarkRate(n);
+  a.state.settings.baseH=10;
+  a.state.resourceDetails[n]={enabled:true,rows:[
     {lv:6,count:1,irrigation:100,hours:1},
     {lv:6,count:1,irrigation:100,hours:10},
   ]};
-  near(a.resourceRequiredHours(n, rate * 10), 9);
-  near(a.resourceRequiredHours(n, rate * 2), 1);
-  near(a.resourceRequiredHours(n, rate * 11), 10);
-  assert.equal(a.resourceRequiredHours(n, rate * 12), null);
-  a.state.resources[n].stock = rate * 3;
-  near(a.resourceRequiredHours(n, rate * 10), 6);
-  assert.equal(a.resourceRequiredHours(n, rate * 2), 0);
-  a.state.resourceDetails[n].rows.forEach(r => r.hours = 0);
-  assert.equal(a.resourceRequiredHours(n, rate * 10), null);
-  a.state.resourceDetails[n].enabled = false;
+  near(a.resourceRequiredHours(n,rate*10),5);
+  near(a.resourceRequiredHours(n,rate*2),1);
+  near(a.resourceRequiredHours(n,rate*11),5.5);
+  near(a.resourceRequiredHours(n,rate*12),6);
+  near(a.resourceOutput(n),rate*11);
+  a.state.resources[n].stock=rate*3;
+  near(a.resourceRequiredHours(n,rate*10),3.5);
+  assert.equal(a.resourceRequiredHours(n,rate*2),0);
+  a.state.resourceDetails[n].rows.forEach(r=>r.hours=0);
+  near(a.resourceRequiredHours(n,rate*10),3.5);
+  assert.equal(a.resourceOutput(n),0);
+  a.state.resourceDetails[n].enabled=false;
   Object.assign(a.state.resources[n],{lv:6,bldgs:2,hours:1,stock:0});
-  near(a.resourceRequiredHours(n, rate * 2), 1);
-  assert.equal(a.resourceRequiredHours(n, rate * 3), null);
+  near(a.resourceRequiredHours(n,rate*3),1.5);
+  a.state.resources[n].bldgs=0;
+  assert.equal(a.resourceRequiredHours(n,rate),null);
 });
 
 // Costs checked 2026-10-29 at https://forgeofgames.com/buildings/{culture}/{slug}
@@ -96,30 +99,41 @@ test('all selectable upgrades, cumulative ranges, fractional counts and budget c
   }
 });
 
-test('random mixed resource schedules agree with an independent completion search', () => {
-  const a = load();let seed=20261029;
-  const random=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
-  for (let i=0;i<1200;i++) {
-    a.reset();a.state.settings.wonder=['아부심벨','쿠푸왕의 피라미드','대스핑크스','호루스의 신전'][i%4];
-    a.state.settings.wLv=i%51;a.state.settings.baseH=8;
-    const n=a.resourceOrder[i%2];
-    const rows=Array.from({length:1+i%6},()=>({lv:1+Math.floor(random()*6),count:random()*4,irrigation:random()*100,hours:random()<.2?0:random()*24}));
-    a.state.resourceDetails[n]={enabled:true,rows};
-    const stock=random()*100000;a.state.resources[n].stock=stock;
-    const total=a.resourceOutput(n),need=stock+total*(i%3===0?1.2:random());
-    const actual=a.resourceRequiredHours(n,need);
-    if(need>stock+total+1e-8){assert.equal(actual,null);continue;}
-    if(need<=stock){assert.equal(actual,0);continue;}
-    const initial=rows.map(r=>({...r,rate:(a.infoResource(n,r.lv).out0/(a.infoResource(n,r.lv).min/60)+Math.floor(a.infoResource(n,r.lv).maxH*r.irrigation/100*a.infoResource(n,r.lv).factor+1e-10))*r.count}));
-    // Infer the common wonder multiplier from full planned output, then search time.
-    const unboosted=initial.reduce((s,r)=>s+r.rate*r.hours,0),mult=total/unboosted;
-    const output=h=>stock+initial.reduce((s,r)=>s+Math.min(h,r.hours)*r.rate*mult,0);
-    let lo=0,hi=Math.max(...rows.map(r=>r.hours));
-    for(let k=0;k<64;k++){const mid=(lo+hi)/2;if(output(mid)>=need)hi=mid;else lo=mid;}
-    near(actual,hi);
-  }
+test('random mixed resource completion extends every configured building beyond its operating window', () => {
+ const a=load();let seed=20261103;
+ const random=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
+ for(let i=0;i<1200;i++){
+  a.reset();a.state.settings.wonder=['아부심벨','쿠푸왕의 피라미드','대스핑크스','호루스의 신전'][i%4];a.state.settings.wLv=i%51;
+  const n=a.resourceOrder[i%2];
+  const rows=Array.from({length:1+i%6},()=>({lv:1+Math.floor(random()*6),count:random()*4,irrigation:random()*100,hours:random()<.2?0:random()*24}));
+  a.state.resourceDetails[n]={enabled:true,rows};
+  const stock=random()*100000;a.state.resources[n].stock=stock;
+  const total=a.resourceOutput(n),need=stock+total*(i%3===0?1.2:random());
+  const actual=a.resourceRequiredHours(n,need);
+  if(need<=stock){assert.equal(actual,0);continue;}
+  const baseRate=(p,h)=>p.out0/(p.min/60)+Math.floor(p.maxH*h/100*p.factor+1e-10);
+  const multiplier=a.resourceBenchmarkRate(n)/baseRate(a.infoResource(n,6),100);
+  const output=h=>stock+rows.reduce((sum,r)=>sum+baseRate(a.infoResource(n,r.lv),r.irrigation)*r.count*multiplier*h,0);
+  let lo=0,hi=1;while(output(hi)<need)hi*=2;
+  for(let k=0;k<64;k++){const mid=(lo+hi)/2;if(output(mid)>=need)hi=mid;else lo=mid;}
+  near(actual,hi);near(a.resourceOutput(n),total);
+ }
 });
 
+test('wonder completion is independent of all operating time inputs and respects completed product cycles', () => {
+ const a=load();a.reset();const n='파피루스 두루마리';
+ a.state.wonder.cur=0;a.state.wonder.tgt=3;a.state.settings.baseH=0;
+ a.state.products[n].stock=0;
+ a.state.details[n]={enabled:true,rows:[{lv:2,count:0.5,irrigation:100,hours:0,mode:'30분'},{lv:3,count:1,irrigation:100,hours:0,mode:'1시간'}]};
+ const need=a.productTargetNeed(n),out=h=>a.state.details[n].rows.reduce((sum,r)=>{const p=a.infoProduct(n,r.lv,r.mode);return sum+Math.floor(h*60/p.min+1e-10)*a.happyCycleOutput(p,r.irrigation)*r.count;},0);
+ let minutes=0;while(out(minutes/60)<need)minutes++;
+ near(a.wonderTime(n),minutes/60);
+ assert.equal(a.productOutput(n),0);
+ a.state.settings.baseH=100;a.state.details[n].rows[0].hours=0.1;a.state.details[n].rows[1].hours=100;
+ near(a.wonderTime(n),minutes/60);
+ a.state.products[n].stock=need;assert.equal(a.wonderTime(n),0);
+ a.state.products[n].stock=0;a.state.details[n].rows.forEach(r=>r.count=0);assert.equal(a.wonderTime(n),null);
+});
 
 test('photo level groups survive reload and drive city totals', () => {
  const a=load();a.reset();a.state.city=a.normalizeCity({...a.state.city,manual:{Irrigation_Channel:5,Workshop_PapyrusPress:1,City_CityHall:1},photoGroups:{Irrigation_Channel:[{lv:2,count:4},{lv:3,count:1}],Workshop_PapyrusPress:[{lv:3,count:1}],City_CityHall:[{lv:2,count:1}]}});
