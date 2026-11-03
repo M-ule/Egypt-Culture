@@ -932,6 +932,10 @@ function requiredQuantity(v){return integerQuantity(v,'ceil');}
 function fmtAvailableQty(v){return fmtQty(availableQuantity(v));}
 function fmtRequiredQty(v){return fmtQty(requiredQuantity(v));}
 function displayedRawConsumption(name){return productOrder.reduce((sum,n)=>sum+requiredQuantity(productUse(n,name)),0);}
+function resourceQuantityView(name){
+ const production=availableQuantity(resourceOutput(name)),need=displayedRawConsumption(name);
+ return {production,need,remain:availableQuantity(num(app.resources[name].stock))+production-need};
+}
 function sleepQuantityView(name){
  const need=productOrder.reduce((sum,n)=>sum+requiredQuantity(sleepRequirementForProduct(n,name)),0);
  const use=productOrder.reduce((sum,n)=>sum+requiredQuantity(sleepPrepProductUse(n,name)),0);
@@ -1083,7 +1087,7 @@ function renderBonus(){
 }
 function renderWonderContext(){const el=document.getElementById('wonderContext');if(el)el.textContent='불가사의: '+app.settings.wonder+' · 보너스 Lv.'+app.settings.wLv}
 function resourceRow(name){
-  const s=app.resources[name],prod=availableQuantity(resourceOutput(name)),cons=displayedRawConsumption(name),remain=availableQuantity(num(s.stock,0))+prod-cons,time=resourceRequiredHours(name,rawConsumption(name)),detail=resourceDetailEnabled(name);
+  const s=app.resources[name],q=resourceQuantityView(name),prod=q.production,cons=q.need,remain=q.remain,time=resourceRequiredHours(name,cons),detail=resourceDetailEnabled(name);
   const levelCell=detail?'<td class="calc detail-active-cell">'+resourceDetailLevelText(name)+'</td>':'<td class="input-cell">'+levelStepper(s.lv)+'</td>';
   const bldgCell=detail?'<td class="num calc detail-active-cell">'+fmtBldg(resourceActualBuildings(name))+'</td>':'<td class="input-cell">'+stepper('bldgs',s.bldgs)+'</td>';
   const happyCell=detail?'<td class="calc detail-active-cell">상세</td>':'<td class="input-cell">'+happinessInput('irrigation',s.irrigation)+'</td>';
@@ -1532,7 +1536,7 @@ resourceRequiredPower=function(name){const n=resourceTargetNeed(name);return n==
 // Reference raw needs use proportional building allocation; actual production still counts completed cycles.
 // Completion time uses configured buildings regardless of the planned operating window, including zero hours.
 wonderTime=function(name){
- const need=productTargetNeed(name);if(need<=0)return 0;
+ const need=Math.max(0,requiredQuantity(wonderNeed(name))-availableQuantity(num(app.products[name].stock)));if(need<=0)return 0;
  const rows=configs('products',name).filter(r=>r.count>0).map(r=>{
   const p=infoProduct(name,r.lv,r.mode);
   return {...r,p,perCycle:p?happyCycleOutput(p,r.irrigation)*r.count:0};
@@ -1547,7 +1551,11 @@ wonderTime=function(name){
 function duration(h){if(h===null||!Number.isFinite(h))return '생산 설정 확인';const m=Math.ceil(Math.max(0,h)*60-1e-7);return m>=60?Math.floor(m/60)+'시간'+(m%60?' '+m%60+'분':''):m+'분';}
 function metric(k,v,state='',tip=''){return '<div class="metric"><span>'+safeText(k)+(tip?' '+helpButton(k,tip):'')+'</span><strong class="'+safeText(state)+'">'+v+'</strong></div>';}
 const TOOLTIPS={"행복도(%)": "이집트의 관개 효과를 0~100%로 입력하세요. 원료 사용량에는 영향을 주지 않습니다.", "레벨": "생산 건물의 현재 레벨을 입력합니다.", "생산 방식": "자원은 연속 생산하며, 상품은 완료한 생산 주기만 계산합니다.", "운영 시간(h)": "비워 두면 항목별 시간, 기본 운영 시간 순으로 적용합니다. 0은 생산하지 않습니다.", "현재 보유량": "현재 가진 수량입니다. K, M 단위로 입력할 수 있습니다.", "예상 생산량": "현재 입력한 건물 구성과 운영 시간을 기준으로 예상되는 생산량입니다.", "잔여/부족": "현재 보유량 + 예상 생산량 − 소비량입니다. 양수는 잔여량, 음수는 부족량입니다.", "소요 시간(h)": "현재 건물 구성으로 부족한 원료를 확보하는 시간입니다. 운영 시간을 넘어도 계산하며, 생산 가능한 건물이 없으면 —로 표시합니다.", "생산력 차이": "현재 생산력 − 필요 생산력입니다. 0 이상이면 충분하고, 음수이면 부족합니다.", "현재 생산력": "목표 레벨에서는 가장 긴 건물 운영 시간 동안 각 건물이 실제 생산한 양을 환산합니다. 수면 영역은 취침 전 시간으로 환산합니다.", "필요 생산력": "목표까지 부족한 양을 현재 생산력과 동일한 비교 시간 안에 생산하기 위한 생산력입니다.", "화폐 사용량": "상품 생산에 사용하는 데벤입니다. 도시 관리의 데벤 잔액에서도 차감합니다.", "필요량": "입력한 상품 생산 계획에 필요한 원료량입니다.", "상세 설정": "건물마다 레벨·생산 방식·행복도·운영 시간이 다를 때 각각 나누어 입력합니다.", "목표 완료 시간(h)": "현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성도 포함하며, 원료 부족 대기 시간은 제외합니다.", "건물 수": "해당 생산에 사용하는 건물 수입니다. 0.5채는 1채의 생산량·소비량·일꾼·면적을 절반으로 계산합니다.", "구간 필요량": "현재 레벨 다음부터 목표 레벨까지 불가사의가 요구하는 상품량입니다."};
-TOOLTIPS['소요 시간']='현재 생산 설정으로 목표 상품량을 확보하는 시간입니다. 입력한 운영 시간을 넘어도 계산하며, 운영 시간이 0인 구성도 포함하며, 원료 부족 대기 시간은 제외합니다. 생산할 수 있는 건물이 없으면 —로 표시합니다.';
+TOOLTIPS['소요 시간']='현재 건물 구성과 생산 주기로 목표 상품량을 확보하는 시간입니다. 운영 시간을 넘어도 계산하며, 원료 부족 대기 시간은 제외합니다. 생산 가능한 건물이 없으면 —로 표시합니다.';
+function tableTooltip(tableId,label){
+ if(tableId==='tResource'&&(label==='소요 시간'||label==='소요 시간(h)'))return '현재 건물 구성으로 부족한 원료를 확보하는 시간입니다. 정수 필요량 기준이며 운영 시간을 넘어도 계산합니다. 생산 가능한 건물이 없으면 —로 표시합니다.';
+ return TOOLTIPS[label];
+}
 TOOLTIPS['데벤 사용량']=TOOLTIPS['화폐 사용량'];
 TOOLTIPS['평균 행복도(%)']=TOOLTIPS['행복도(%)'];
 function helpButton(label,tip){return '<button type="button" class="info-tip" data-tip="'+safeText(tip)+'" aria-label="'+safeText(label)+' 설명">i</button>';}
@@ -1558,7 +1566,7 @@ function showTermHelp(info){
  const extra=info.dataset.helpExtra?$(info.dataset.helpExtra):null;
  const card=info.closest('.sectionbar')?.closest('.card');
  const fields=card?[...card.querySelectorAll('thead th')].map(th=>th.dataset.label||th.textContent.trim()).filter((label,i,all)=>TOOLTIPS[label]&&all.indexOf(label)===i):[];
- $('termHelpBody').textContent=info.dataset.tip+(extra?'\n\n'+extra.textContent:'')+(fields.length?'\n\n'+fields.map(label=>label+'\n'+TOOLTIPS[label]).join('\n\n'):'');
+ $('termHelpBody').textContent=info.dataset.tip+(extra?'\n\n'+extra.textContent:'')+(fields.length?'\n\n'+fields.map(label=>label+'\n'+tableTooltip(card?.querySelector('table')?.id,label)).join('\n\n'):'');
  if(!box.open)box.showModal();
 }
 // Compact hover/focus help; touch keeps the full help dialog.
@@ -1587,7 +1595,7 @@ window.addEventListener('resize',hideTermTooltip);
 function labelTables(){
  for(const t of document.querySelectorAll('table')){
   const headers=[...t.querySelectorAll('thead th')].map(th=>th.dataset.label||th.textContent.trim());
-  t.querySelectorAll('thead th').forEach((th,i)=>{th.dataset.label=headers[i];const tip=t.id==='tConvert'&&headers[i]==='생산 방식'?null:TOOLTIPS[headers[i]];if(tip&&!th.querySelector('.info-tip'))th.innerHTML=safeText(headers[i])+' '+helpButton(headers[i],tip);});
+  t.querySelectorAll('thead th').forEach((th,i)=>{th.dataset.label=headers[i];const tip=t.id==='tConvert'&&headers[i]==='생산 방식'?null:tableTooltip(t.id,headers[i]);if(tip&&!th.querySelector('.info-tip'))th.innerHTML=safeText(headers[i])+' '+helpButton(headers[i],tip);});
   for(const row of t.querySelectorAll('tbody tr'))[...row.cells].forEach((td,i)=>{td.dataset.label=headers[i]||'';td.querySelector(':scope > .mobilelabel')?.remove();if(i&&t.id!=='tConvert'){const span=document.createElement('span');span.className='mobilelabel';span.textContent=headers[i]||'';td.prepend(span);}td.querySelectorAll('input,select').forEach(el=>el.setAttribute('aria-label',(row.dataset.name||row.cells[0]?.querySelector('select')?.selectedOptions[0]?.textContent||row.cells[0]?.textContent||'항목')+' '+headers[i]));});
  }
  const inputHelp={bonusLv:'현재 적용받는 불가사의 보너스 레벨입니다.',baseH:'항목별 시간을 비워 두면 적용됩니다. 상세 설정 → 항목별 시간 → 기본 운영 시간 순으로 우선하며, 0은 생산하지 않습니다.',sleepPrepH:'취침 전까지 남은 시간입니다. 건물별 운영 시간과 이 시간 중 짧은 시간을 적용하며, 비우면 기본 운영 시간을 사용합니다.',sleepCycle:'취침 전에 예약할 주기입니다. 해당 레벨에 없는 주기는 가장 긴 생산 주기로 적용합니다.',sleepCount:'건물 1채당 예약할 생산 횟수입니다. 모든 횟수에 필요한 원료를 취침 전까지 확보해야 합니다.',productRawCycle:'목표 상품 부족분을 Lv6·행복도 100% 기준으로 환산합니다. 생산 계산기값은 상품별 설정 주기를 따릅니다. 상세 설정은 건물 수·운영 시간·기준 생산량 비중으로 반영하며, 운영 시간이 모두 0이면 건물 수·기준 생산량 비중을 사용합니다. Lv6에 없는 주기는 가장 가까운 주기를 사용합니다.'};
@@ -1603,7 +1611,7 @@ function renderProductionSummary(){
  if(b.target&&b.bonus)values.push(safeText(b.target)+' +'+fmtPct(b.bonus));
  if(app.settings.wonder==='호루스의 신전')values.push('데벤 +'+fmtPct(horusDebenBonus()));
  values.push('일꾼 +'+fmtQty(workerInfo().workers)+'명');
- const short=resourceOrder.filter(n=>num(app.resources[n].stock)+resourceOutput(n)-rawConsumption(n)<-1e-8);
+ const short=resourceOrder.filter(n=>resourceQuantityView(n).remain<0);
  const rows=[...resourceOrder.flatMap(n=>configs('resources',n).map(r=>({count:r.count,hours:configHours('resources',n,r)}))),...productOrder.flatMap(n=>configs('products',n).map(r=>({count:r.count,hours:configHours('products',n,r)})))];
  const configured=rows.some(r=>r.count>0),operating=rows.some(r=>r.count>0&&r.hours>0);
  const status=!configured?metric('생산 설정 확인','건물 수를 입력하세요.'):!operating?metric('생산 설정 확인','운영 시간을 입력하세요.') :itemSummary('조정 필요 생산 항목',short,short.length?'bad':'');
@@ -1684,7 +1692,7 @@ function initializeNavigation(){
 }
 
 resourceRequiredHours=function(name,consumption){
- const remaining=Math.max(0,consumption-num(app.resources[name].stock));if(remaining<=0)return 0;
+ const remaining=Math.max(0,requiredQuantity(consumption)-availableQuantity(num(app.resources[name].stock)));if(remaining<=0)return 0;
  const rate=configs('resources',name).reduce((sum,r)=>sum+continuousOutput(infoResource(name,r.lv),1,Math.max(0,num(r.count)),r.irrigation,resourceWonderMultiplier(name)),0);
  return rate>0?remaining/rate:null;
 };

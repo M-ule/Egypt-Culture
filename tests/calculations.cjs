@@ -25,34 +25,26 @@ const load = () => new Function(runtime + `
  productOrder,resourceOrder,productOutput,productTargetNeed,resourceTargetNeed,
  productAdjustment,resourceAdjustment,wonderTime,sleepResourcePower,configs,configHours,
  infoProduct,infoResource,happyCycleOutput,productBenchmarkRate,productLevels,modesForProduct,
- availableQuantity,requiredQuantity,displayedRawConsumption,sleepQuantityView,cityQuantityView,fmtPower,fmtBldg,fmtHours,
+ availableQuantity,requiredQuantity,displayedRawConsumption,resourceQuantityView,sleepQuantityView,cityQuantityView,fmtPower,fmtBldg,fmtHours,
  cyclicOutput,CITY_VARIANTS,normalizeCity,cityGroups,maxReachResourceLevel,targetRawRequirementTo,WONDER};`)();
 function near(actual, expected) { assert(Math.abs(actual - expected) <= 1e-7 * Math.max(1, Math.abs(expected)), `${actual} != ${expected}`); }
 
-test('resource completion ignores planned stops and zero hours, preserves stock and unavailable buildings', () => {
-  const a=load();a.reset();
-  const n='파피루스',rate=a.resourceBenchmarkRate(n);
-  a.state.settings.baseH=10;
-  a.state.resourceDetails[n]={enabled:true,rows:[
-    {lv:6,count:1,irrigation:100,hours:1},
-    {lv:6,count:1,irrigation:100,hours:10},
-  ]};
-  near(a.resourceRequiredHours(n,rate*10),5);
-  near(a.resourceRequiredHours(n,rate*2),1);
-  near(a.resourceRequiredHours(n,rate*11),5.5);
-  near(a.resourceRequiredHours(n,rate*12),6);
-  near(a.resourceOutput(n),rate*11);
-  a.state.resources[n].stock=rate*3;
-  near(a.resourceRequiredHours(n,rate*10),3.5);
-  assert.equal(a.resourceRequiredHours(n,rate*2),0);
-  a.state.resourceDetails[n].rows.forEach(r=>r.hours=0);
-  near(a.resourceRequiredHours(n,rate*10),3.5);
-  assert.equal(a.resourceOutput(n),0);
-  a.state.resourceDetails[n].enabled=false;
-  Object.assign(a.state.resources[n],{lv:6,bldgs:2,hours:1,stock:0});
-  near(a.resourceRequiredHours(n,rate*3),1.5);
-  a.state.resources[n].bldgs=0;
-  assert.equal(a.resourceRequiredHours(n,rate),null);
+test('resource completion uses integer demands beyond planned stops and zero hours', () => {
+ const a=load();a.reset();const n='파피루스',rate=a.resourceBenchmarkRate(n),unit=Math.floor(rate);
+ a.state.settings.baseH=10;
+ a.state.resourceDetails[n]={enabled:true,rows:[{lv:6,count:1,irrigation:100,hours:1},{lv:6,count:1,irrigation:100,hours:10}]};
+ near(a.resourceRequiredHours(n,unit*10),unit*10/(2*rate));
+ near(a.resourceRequiredHours(n,unit*12),unit*12/(2*rate));
+ near(a.resourceOutput(n),rate*11);
+ a.state.resources[n].stock=unit*3;
+ near(a.resourceRequiredHours(n,unit*10),unit*7/(2*rate));
+ assert.equal(a.resourceRequiredHours(n,unit*2),0);
+ a.state.resourceDetails[n].rows.forEach(r=>r.hours=0);
+ near(a.resourceRequiredHours(n,unit*10),unit*7/(2*rate));assert.equal(a.resourceOutput(n),0);
+ a.state.resourceDetails[n].enabled=false;
+ Object.assign(a.state.resources[n],{lv:6,bldgs:2,hours:1,stock:0});
+ near(a.resourceRequiredHours(n,unit*3),unit*3/(2*rate));
+ a.state.resources[n].bldgs=0;assert.equal(a.resourceRequiredHours(n,unit),null);
 });
 
 // Costs checked 2026-10-29 at https://forgeofgames.com/buildings/{culture}/{slug}
@@ -107,8 +99,8 @@ test('random mixed resource completion extends every configured building beyond 
   const n=a.resourceOrder[i%2];
   const rows=Array.from({length:1+i%6},()=>({lv:1+Math.floor(random()*6),count:random()*4,irrigation:random()*100,hours:random()<.2?0:random()*24}));
   a.state.resourceDetails[n]={enabled:true,rows};
-  const stock=random()*100000;a.state.resources[n].stock=stock;
-  const total=a.resourceOutput(n),need=stock+total*(i%3===0?1.2:random());
+  const stock=Math.floor(random()*100000);a.state.resources[n].stock=stock;
+  const total=a.resourceOutput(n),need=Math.ceil(stock+total*(i%3===0?1.2:random()));
   const actual=a.resourceRequiredHours(n,need);
   if(need<=stock){assert.equal(actual,0);continue;}
   const baseRate=(p,h)=>p.out0/(p.min/60)+Math.floor(p.maxH*h/100*p.factor+1e-10);
@@ -255,4 +247,21 @@ test('displayed city budget uses rounded line items without changing financial c
   assert(Number.isInteger(budget.build.deben));
   assert.equal(budget.remaining,budget.secured-budget.required);
   assert.equal(budget.required,budget.consumption+(budget.build.deben||0)+(budget.research.deben||0));
+});
+
+
+test('rounded shortage and completion agree at the 30.6 versus 31 unit boundary', () => {
+ const a=load();a.reset();a.state.settings.baseH=1/60;
+ Object.assign(a.state.resources['파피루스'],{lv:1,bldgs:1,irrigation:100});
+ Object.assign(a.state.products['파피루스 두루마리'],{lv:1,bldgs:0.51,irrigation:100,mode:'1분'});
+ assert.deepEqual(a.resourceQuantityView('파피루스'),{production:30,need:31,remain:-1});
+ const h=a.resourceRequiredHours('파피루스',30.6);
+ assert(h>1/60);assert.equal(Math.ceil(h*60),2);
+ near(a.resourceOutput('파피루스'),30.7475);
+ // The whole target is complete at h, with the immediately preceding minute still short.
+ const rate=a.resourceOutput('파피루스')*60;
+ near(h*rate,31);
+ a.state.resources['파피루스'].stock=1;
+ assert.equal(a.resourceQuantityView('파피루스').remain,0);
+ assert.equal(Math.ceil(a.resourceRequiredHours('파피루스',30.6)*60),1);
 });
