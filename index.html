@@ -756,17 +756,18 @@ button.detail-badge:hover{background:#eee2b3}
 
 /* Production settings: inputs first, storage together, table view nearest the tables. */
 #prodSettings .production-settings-head{flex-wrap:nowrap}
+#prodSettings .production-settings-head h2{margin-right:auto}
 #prodSettings .production-settings-head h2{flex:0 1 auto;min-width:0}
 #prodSettings #photoImportBtn{flex:0 0 auto;min-height:44px}
 #prodSettings .production-settings-fields{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:20px;margin-bottom:16px}
 #prodSettings .production-settings-fields label{width:100%;min-width:0;gap:6px;white-space:nowrap}
 #prodSettings .production-settings-fields .number-step{width:114px;flex:0 0 114px;margin-left:auto}
 #prodSettings #wonderName{width:210px;max-width:100%;flex:1;min-width:0;margin-left:4px}
-#prodSettings .production-settings-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+#prodSettings .production-settings-actions{display:flex;align-items:center;gap:10px}
 #prodSettings .production-settings-actions>button,#prodSettings .production-storage-actions>button:not(.info-tip){min-height:44px;white-space:nowrap}
 #prodSettings #prodView{order:0;width:auto;margin:0}
-#prodSettings .production-storage-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
-#prodSettings #resetBtn{flex:0 0 auto;margin-left:14px}
+#prodSettings .production-storage-actions{display:flex;align-items:center;gap:8px;margin-left:12px}
+#prodSettings #resetBtn{flex:0 0 auto;margin-left:8px}
 #prodSettings #resetStatus{display:block;margin-top:8px;font-size:13px}
 #prodSettings #resetStatus:empty{display:none}
 @media(max-width:1100px){
@@ -778,32 +779,44 @@ button.detail-badge:hover{background:#eee2b3}
  #prodSettings .production-settings-fields{gap:10px}
  #prodSettings #wonderName{flex:0 1 58%;font-size:16px}
  #prodSettings .production-settings-fields .number-step{width:120px;flex-basis:120px}
- #prodSettings .production-settings-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 10px}
- #prodSettings .production-storage-actions{grid-column:1/-1;grid-row:1;width:100%;margin:0;gap:6px}
+
+}
+
+/* Keep both calculation views at the right edge of their title bars. */
+#wonderSettings .sectionbar{flex-wrap:nowrap}
+#wonderSettings #wonderView{flex:0 0 auto;width:auto;order:0;margin:0 0 0 auto;min-height:44px;white-space:nowrap}
+@media(max-width:900px){
+ #prodSettings .production-settings-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 10px}
+ #prodSettings .production-settings-head h2{grid-column:1;grid-row:1;justify-self:start;margin:0}
+ #prodSettings .production-settings-actions{display:contents}
+ #prodSettings #photoImportBtn{grid-column:2;grid-row:1;justify-self:end}
+ #prodSettings .production-storage-actions{grid-column:1/-1;grid-row:2;width:100%;margin:0;gap:6px}
  #prodSettings .production-storage-actions>button:not(.info-tip){flex:1;min-width:0;padding:8px 6px;font-size:13px}
- #prodSettings #prodView{grid-column:1;grid-row:2;justify-self:start;min-width:110px;font-size:13px}
- #prodSettings #resetBtn{grid-column:2;grid-row:2;margin:0;font-size:13px}
+ #prodSettings #resetBtn{grid-column:1;grid-row:3;justify-self:start;margin:0;font-size:13px}
+ #prodSettings #prodView{grid-column:2;grid-row:3;justify-self:end;width:auto;margin:0;font-size:13px}
 }
 </style></head><body><main><h1>이집트 문명 시뮬레이터</h1><div class="legend muted"><span class="chip"></span>노란 칸에 입력</div><nav class="tabs" aria-label="계산기 탭"><button class="tab active" data-tab="prod">생산 계산기</button><button class="tab" data-tab="wonder">불가사의 목표</button><button class="tab" data-tab="city">도시 관리</button></nav><section id="panel-prod" class="panel active"><nav class="mobile-section-nav" aria-label="생산 계산기 섹션 바로가기"><a href="#stage0">기초 자원</a><a href="#stage2">상품</a></nav><div class="card" id="prodSettings">
-<div class="sectionbar production-settings-head"><h2>생산 설정 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간으로 생산량을 계산합니다. 건물 수는 소수점 입력이 가능합니다. 원료·일꾼 부족은 자동 반영되지 않으므로 잔여량과 도시 관리에서 확인하세요." data-help-extra="bonusBox" aria-label="생산 설정 설명">i</button></h2><button id="photoImportBtn" type="button">사진으로 입력</button></div>
+<div class="sectionbar production-settings-head"><h2>생산 설정 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간으로 생산량을 계산합니다. 건물 수는 소수점 입력이 가능합니다. 원료·일꾼 부족은 자동 반영되지 않으므로 잔여량과 도시 관리에서 확인하세요." data-help-extra="bonusBox" aria-label="생산 설정 설명">i</button></h2>
+<div class="production-settings-actions">
+<button id="photoImportBtn" type="button">사진으로 입력</button>
+<div class="production-storage-actions" role="group" aria-label="생산 입력값 저장 및 불러오기">
+<button id="saveDefaultBtn" type="button">생산 입력값 저장</button><button id="loadDefaultBtn" type="button">저장값 불러오기</button><button type="button" class="info-tip" data-tip="입력값은 자동으로 유지됩니다. ‘생산 입력값 저장’은 현재 값을 별도로 보관하며, ‘저장값 불러오기’로 복원합니다. 이 기기·브라우저에서만 사용할 수 있습니다." aria-label="입력값 저장 설명">i</button>
+</div>
+<button id="resetBtn" type="button" class="danger">초기화</button>
+<button id="prodView" type="button">상세 보기</button>
+</div></div>
 <div class="bar production-settings-fields">
 <label>불가사의<select id="wonderName"><option>아부심벨</option><option>쿠푸왕의 피라미드</option><option>대스핑크스</option><option>호루스의 신전</option></select></label>
 <label>보너스 적용 레벨<input id="bonusLv" type="number" min="0" max="50"></label>
 <label>기본 운영 시간(h)<input id="baseH" type="number" min="0" step="any"></label>
 </div>
 <div id="bonusSummary" class="summary"></div><div id="bonusBox" class="note" hidden></div>
-<div class="production-settings-actions">
-<button id="prodView" type="button">상세 보기</button>
-<div class="production-storage-actions" role="group" aria-label="생산 입력값 저장 및 불러오기">
-<button id="saveDefaultBtn" type="button">생산 입력값 저장</button><button id="loadDefaultBtn" type="button">저장값 불러오기</button><button type="button" class="info-tip" data-tip="입력값은 자동으로 유지됩니다. ‘생산 입력값 저장’은 현재 값을 별도로 보관하며, ‘저장값 불러오기’로 복원합니다. 이 기기·브라우저에서만 사용할 수 있습니다." aria-label="입력값 저장 설명">i</button>
-</div>
-<button id="resetBtn" type="button" class="danger">초기화</button>
-</div><span id="resetStatus" role="status"></span>
+<span id="resetStatus" role="status"></span>
 </div><div id="productionSections"><div class="card" id="stage0"><div class="sectionbar"><h2>기초 자원 <button type="button" class="info-tip" data-tip="건물 구성과 운영 시간에 따른 생산량을 상품 생산에 필요한 원료량과 비교합니다." aria-label="기초 자원 설명">i</button></h2><button id="resourceDetailOpen">기초 자원 상세 설정</button></div><div class="wrap"><table class="prodtable" id="tResource"><thead><tr>
     <th>자원</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>잔여/부족</th><th>예상 생산량</th><th>필요량</th><th>소요 시간</th>
   </tr></thead><tbody></tbody></table></div><span id="resourceDetailSummary" class="muted"></span></div><div class="card" id="stage2"><div class="sectionbar"><h2>상품 <button type="button" class="info-tip" data-tip="완료한 생산 주기를 기준으로 생산량과 데벤·원료 사용량을 계산합니다." aria-label="상품 설명">i</button></h2><button id="productDetailOpen">상품 상세 설정</button></div><div class="wrap"><table class="prodtable" id="tProduct"><thead><tr>
     <th>상품</th><th>레벨</th><th>생산 방식</th><th>건물 수</th><th>행복도(%)</th><th>운영 시간(h)</th><th>현재 보유량</th><th>예상 생산량</th><th>데벤 사용량</th><th>파피루스 사용량</th><th>금 사용량</th>
-  </tr></thead><tbody></tbody></table></div><span id="productDetailSummary" class="muted"></span></div></div></section><section id="panel-wonder" class="panel"><nav class="mobile-section-nav" aria-label="불가사의 목표 섹션 바로가기"><a href="#goalCard">목표 현황</a><a href="#sleepCard">수면</a><a href="#powerCard">생산력</a><a href="#conversionCard">환산표</a></nav><div class="card" id="wonderSettings"><div class="sectionbar"><h2>불가사의 목표 <button type="button" class="info-tip" data-tip="현재 레벨 다음부터 목표 레벨까지 필요한 상품량을 계산합니다." aria-label="불가사의 목표 설명">i</button></h2></div><div class="bar"><label>현재 레벨<input id="curLv" type="number" min="0" max="50"></label><label>목표 레벨<input id="tgtLv" type="number" min="0" max="50"></label><span id="wonderContext" class="wonder-context"></span><span id="wonderBaseHDisplay" hidden></span><button id="wonderView" class="push">상세 보기</button></div><div id="goalSummary" class="summary"></div></div><div class="card" id="goalCard"><div class="sectionbar"><h2>목표 달성 현황 <button type="button" class="info-tip" data-tip="잔여/부족은 입력한 운영 시간 기준입니다. 소요 시간은 현재 생산 설정으로 목표량을 확보할 때까지 계산하며, 원료·일꾼이 충분하다고 가정합니다. 운영 시간이 0인 구성은 제외합니다." aria-label="목표 달성 현황 설명">i</button></h2></div><div id="goalTable"><div class="wrap"><table class="result-table" id="tGoal"><thead><tr>
+  </tr></thead><tbody></tbody></table></div><span id="productDetailSummary" class="muted"></span></div></div></section><section id="panel-wonder" class="panel"><nav class="mobile-section-nav" aria-label="불가사의 목표 섹션 바로가기"><a href="#goalCard">목표 현황</a><a href="#sleepCard">수면</a><a href="#powerCard">생산력</a><a href="#conversionCard">환산표</a></nav><div class="card" id="wonderSettings"><div class="sectionbar"><h2>불가사의 목표 <button type="button" class="info-tip" data-tip="현재 레벨 다음부터 목표 레벨까지 필요한 상품량을 계산합니다." aria-label="불가사의 목표 설명">i</button></h2><button id="wonderView" type="button">상세 보기</button></div><div class="bar"><label>현재 레벨<input id="curLv" type="number" min="0" max="50"></label><label>목표 레벨<input id="tgtLv" type="number" min="0" max="50"></label><span id="wonderContext" class="wonder-context"></span><span id="wonderBaseHDisplay" hidden></span></div><div id="goalSummary" class="summary"></div></div><div class="card" id="goalCard"><div class="sectionbar"><h2>목표 달성 현황 <button type="button" class="info-tip" data-tip="잔여/부족은 입력한 운영 시간 기준입니다. 소요 시간은 현재 생산 설정으로 목표량을 확보할 때까지 계산하며, 원료·일꾼이 충분하다고 가정합니다. 운영 시간이 0인 구성은 제외합니다." aria-label="목표 달성 현황 설명">i</button></h2></div><div id="goalTable"><div class="wrap"><table class="result-table" id="tGoal"><thead><tr>
     <th>상품</th><th>잔여/부족</th><th>구간 필요량</th><th>현재 보유량</th><th>예상 생산량</th><th>예상 보유량</th><th>소요 시간</th>
   </tr></thead><tbody></tbody></table></div></div></div><div class="card" id="sleepCard"><div class="sectionbar"><h2>수면 대비 자원 확보 <button type="button" class="info-tip" data-tip="취침 전까지 예약 생산에 필요한 원료를 확보할 수 있는지 확인합니다. 현재 보유량과 취침 전 생산·소비를 반영하며, 수면 중 자원 생산량은 포함하지 않습니다." data-help-extra="sleepActual" aria-label="수면 대비 자원 확보 설명">i</button></h2></div><div class="bar"><label>수면까지 남은 시간(h)<input id="sleepPrepH" type="number" min="0" step="any" placeholder="기본"></label><label>수면 중 생산 주기<select id="sleepCycle"><option value="최장">레벨별 최장</option><option value="30분">30분</option><option value="1시간">1시간</option><option value="2시간">2시간</option></select>
     </label><label>생산 횟수<input id="sleepCount" type="number" min="0"></label></div><div id="sleepActual" class="note" hidden></div><div id="sleepTable"><div class="wrap"><table class="result-table" id="tSleep"><thead><tr>
