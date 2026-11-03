@@ -25,6 +25,7 @@ const load = () => new Function(runtime + `
  productOrder,resourceOrder,productOutput,productTargetNeed,resourceTargetNeed,
  productAdjustment,resourceAdjustment,wonderTime,sleepResourcePower,configs,configHours,
  infoProduct,infoResource,happyCycleOutput,productBenchmarkRate,productLevels,modesForProduct,
+ availableQuantity,requiredQuantity,displayedRawConsumption,sleepQuantityView,cityQuantityView,fmtPower,fmtBldg,fmtHours,
  cyclicOutput,CITY_VARIANTS,normalizeCity,cityGroups,maxReachResourceLevel,targetRawRequirementTo,WONDER};`)();
 function near(actual, expected) { assert(Math.abs(actual - expected) <= 1e-7 * Math.max(1, Math.abs(expected)), `${actual} != ${expected}`); }
 
@@ -201,4 +202,43 @@ test('reach follows reference cycle including mixed per-product cycle inheritanc
   assert.equal(a.maxReachResourceLevel(),target);
   a.state.settings.productRawCycle='생산 계산기값';
   assert(a.maxReachResourceLevel()<target);
+});
+
+
+test('displayed inventory reconciles fractional production and conservative per-product consumption', () => {
+  const a=load();a.reset();
+  a.state.settings.baseH=1/60;
+  Object.assign(a.state.resources['파피루스'],{lv:1,bldgs:1,irrigation:100,stock:100});
+  Object.assign(a.state.products['파피루스 두루마리'],{lv:1,bldgs:0.13,irrigation:100,mode:'1분'});
+  near(a.resourceOutput('파피루스'),30.7475);
+  assert.equal(a.availableQuantity(a.resourceOutput('파피루스')),30);
+  near(a.productOutput('파피루스 두루마리'),0.91);
+  assert.equal(a.availableQuantity(a.productOutput('파피루스 두루마리')),0);
+  assert.equal(a.displayedRawConsumption('파피루스'),8);
+  assert.deepEqual(a.sleepQuantityView('파피루스'),{need:24,projected:122,remain:98});
+  // Quantity presentation must not round the underlying production functions.
+  near(a.resourceOutput('파피루스'),30.7475);
+  assert.equal(a.availableQuantity(31-1e-12),31);
+  assert.equal(a.requiredQuantity(31+1e-12),31);
+  assert.equal(a.availableQuantity(-0.2),-1);
+  assert.equal(a.availableQuantity(null),null);
+  assert.equal(a.requiredQuantity(Infinity),null);
+  assert.equal(a.fmtPower(12.34),'12.3');
+  assert.equal(a.fmtBldg(0.13),'0.13');
+  assert.equal(a.fmtHours(0.25),'0.25');
+});
+
+test('displayed city budget uses rounded line items without changing financial calculation precision', () => {
+  const a=load();a.reset();a.state.settings.baseH=1;
+  Object.assign(a.state.city,{debenStock:10,debenRate:100.1,debenHours:1});
+  Object.assign(a.state.products['파피루스 두루마리'],{lv:1,bldgs:0.13,irrigation:100,mode:'1분'});
+  const raw=a.cityStats(),shown=a.cityQuantityView(raw);
+  near(raw.production,100.1);near(raw.consumption,15.6);
+  assert.equal(shown.production,100);assert.equal(shown.consumption,16);
+  assert.equal(shown.secured,110);assert.equal(shown.required,16);assert.equal(shown.remaining,94);
+  a.state.city.construction=[{id:'Home_Small',cur:0,tgt:1,count:0.13}];
+  const budget=a.cityQuantityView(a.cityStats());
+  assert(Number.isInteger(budget.build.deben));
+  assert.equal(budget.remaining,budget.secured-budget.required);
+  assert.equal(budget.required,budget.consumption+(budget.build.deben||0)+(budget.research.deben||0));
 });
